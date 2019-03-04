@@ -1,6 +1,6 @@
-from flask import render_template
+from flask import render_template, request
 from flask_appbuilder.models.sqla.interface import SQLAInterface
-from flask_appbuilder import ModelView
+from flask_appbuilder import ModelView, BaseView, expose
 from app import appbuilder, db
 
 """
@@ -16,6 +16,11 @@ from app import appbuilder, db
 
     appbuilder.add_view(MyModelView, "My View", icon="fa-folder-open-o", category="My Category", category_icon='fa-envelope')
 """
+class MidorewdDashboardView(BaseView):
+    default_view = 'midorewd'
+    @expose('/midorewd', methods=['POST', 'GET'])
+    def midorewd(self): 
+        return self.render_template('midorewd.html')
 
 """
     Application wide 404 error handler
@@ -26,4 +31,5 @@ def page_not_found(e):
 
 db.create_all()
 
+appbuilder.add_view(MidorewdDashboardView, "Early Works Document", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
 

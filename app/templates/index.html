@@ -1,0 +1,99 @@
+{% extends "appbuilder/base.html" %}
+{% block content %}
+
+<div class="jumbotron row">
+    
+  
+    <div class="col-md-6" style="text-align:left; vertical-align:top">
+        
+            
+            <h3><span style="color:#4b1f68">Middle East Oil Refinery </span></h3>
+              <h3>EXPANSION PROJECT</h3>
+            
+            <div align="justify">
+              <br>
+            <p>
+              The contract was inked by MIDOR chairman Mohamed Abdel Aziz and Marco Villa, president of Technip’s for EMIA Region, in the presence of petroleum minister Tarek El Molla.
+
+The contract’s value, including construction and design, amounted to $1.7 billion, while the project’s total cost recorded $2.2 billion, according to the ministry’s statement.
+
+The project aims at increasing petroleum products, in addition to raising the refinery’s capacity to 175,000 barrels per day (bpd) instead of 115,000 bpd.
+
+The ministry is working on expediting the development of refineries with $8 billion in investments to be opened as scheduled, El Molla said on Wednesday, 6 June.
+
+El-Molla noted that the ministry has completed about 97.3% of a project aiming at doubling the production capacity of gas 92 and 95 octane gasoline by adding 850,000 tonnes per annum in a bid to meet local market’s requirements.
+
+(Source: Thomson Reuters ZAWYA)
+
+            </p>
+            <div align="right">
+            </div>
+            <!--
+            <p><strong>PM:&nbsp</strong>Aglaia Ciuna</p>
+        
+            <p><i class="fas fa-envelope"></i>&nbspa.ciuna@quasarPM.com</small></p>
+            -->
+          </div>
+          
+    </div> 
+       
+    
+    <div class="col-md-6" style="text-align:left; padding-left: 100px";>
+        <hr><small>
+            
+            <img src="https://energyegypt.net/wp-content/uploads/2018/08/midor.jpg" alt="Midor" height="300">
+            <br>
+            <br>
+            <p><a href="/docrequestsview/add"><i id="eng_ico" class="fas fa-copy element"></i>&nbsp ENGINEERING</a></p>
+            <br>
+            <br>
+            <p><a href="/vendorrequestsview/add"><i id="ven_ico" class="fas fa-copy element"></i>&nbsp VENDOR</a></p>
+            
+          
+            <!--<h3><a href="/docrequestsview/list/"><img border="0" src="/static/img/logo_technipfmc_w.png" alt="W3Schools" class="center" width="70%" height="70%"></a></h3>
+            -->
+            <!--<p>{{_("In this area you can also list, add, edit, delete and export bapco's codes. Functionalities and permissions are based on you role.  ")}}</p>-->
+            <!--<a class="btn btn-primary" href="#" role="button">Vendor Code</a>-->
+        
+    </div>
+</div>
+
+<!--
+
+<div class="jumbotron" style="text-align:center">
+  <div class="container">
+    <p><img border="0" src="/static/img/excel.png" alt="W3Schools" width="64" height="64"></p>
+    <h1>{{_("Update from Excel")}}</h1>
+    <h2>{{_("Document Encoding Tool by QuasarPM.com")}}</h2>
+    <p>{{_("Generate unique code for Bapco")}}</p>
+<script>
+
+  //Dropzone.autoDiscover = false;
+  Dropzone.uploadMultiple = true;
+  Dropzone.options.myDropzone = {
+    uploadMultiple: true,
+    paramName: "file",
+  };
+  //Dropzone.parallelUploads = 1;
+  Dropzone.autoProcessQueue = false;
+</script>
+    <form action="/uploadcodes/excel/ajax" method="POST" class="dropzone" id="my-dropzone">
+
+      <div class="fallback">
+          <input name="file" type="file" multiple />
+          <input type="submit" value="Upload" class="btn btn-success"/>button
+      </div>
+    </form>
+    <script>
+        document.write(moment("2012-12-31T23:55:13Z").format('LLLL'));
+        </script>
+    
+    <script>
+      function sendForm(){
+        Dropzone.processQueue();
+      }
+    </script>
+  </div>
+</div>
+-->
+{% endblock %}

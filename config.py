@@ -20,7 +20,7 @@ CSRF_ENABLED = True
 APP_NAME = "Midor"
 
 # Uncomment to setup Setup an App icon
-#APP_ICON = "static/img/logo.jpg"
+APP_ICON = "/static/img/midor.png" 
 
 #----------------------------------------------------
 # AUTHENTICATION CONFIG
