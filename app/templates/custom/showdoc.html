@@ -1,0 +1,60 @@
+{% extends "appbuilder/base.html" %}
+{% import 'appbuilder/general/lib.html' as lib %}
+
+{% block content %}
+{{ lib.panel_begin(title) }}
+
+{% if related_views is defined %}
+    <ul class="nav nav-tabs">
+    <li class="active"><a href="#Home" data-toggle="tab">{{ _("Detail") }}</a> </li>
+        {% for view in related_views %}
+            <li>
+                <a href="#{{view.__class__.__name__}}" data-toggle="tab">{{view.title}}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="tab-content">
+    {% for view in related_views %}
+        <div id="{{view.__class__.__name__}}" class="tab-pane">
+            {{ widgets.get('related_views')[loop.index - 1](pk = pk)|safe }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% block show_form %}
+<table>
+    <td>
+    <div id="Home" class="tab-pane active">
+        {{ widgets.get('show')()|safe }}
+    </div>
+    </td>
+    {% for fieldset_item in fieldsets %}
+    {% call lib.accordion_tag(loop.index,fieldset_item[0], expanded) %}
+    <td><span style="white-space: pre-line">{{value_columns[include_columns.index(item)]}}</span></td>
+
+    {% endcall %}
+    {% endfor %}
+    <td>
+            {% for item in include_columns %}
+            <tr>
+                <th class="col-lg-2 col-md-2 col-sm-2">{{label_columns.get(item)}}</th>
+                <td>
+                    {% set formatter = formatters_columns.get(item) %}
+                    {% set v = value_columns[loop.index-1]%}
+                    <span style="white-space: pre-line">{{formatter(v) if formatter else v}}</span>
+                </td>
+            </tr>
+        {% endfor %}
+    </td>
+</table>
+{% endblock show_form %}
+
+{% if related_views is defined %}</div>{% endif %}
+{{ lib.panel_end() }}
+
+{% endblock content %}
+
+{% block add_tail_js %}
+<script src="{{url_for('appbuilder.static',filename='js/ab_keep_tab.js')}}"></script>
+{% endblock %}

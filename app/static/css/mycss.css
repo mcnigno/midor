@@ -149,6 +149,7 @@ h3, .h3 {
     margin-right: 5px;
     margin-left: 5px;
 }
+/*
 body > div.container > div > div > div:nth-child(3) > div.table-responsive > table > tbody > tr > td{
     padding: 3px;
     vertical-align: bottom;
@@ -167,6 +168,7 @@ body > div.container > div > div > div:nth-child(3) > div.table-responsive > tab
     text-align: center;
  
 }
+*/
 #s_label {
     font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
     text-transform: uppercase;
