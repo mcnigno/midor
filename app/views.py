@@ -27,7 +27,7 @@ class MidorewdDashboardView(BaseView):
 
 class EarlyWorksDocView(ModelView):
     datamodel = SQLAInterface(EarlyWorksDoc)
-    list_columns = ['discipline', 'contractor_code','short_desc','file_pdf']
+    list_columns = ['discipline', 'contractor_code','short_desc','file']
     #show_template = 'custom/showdoc.html'               
 
 class EarlyWorksDocViewRestricted(ModelView):
