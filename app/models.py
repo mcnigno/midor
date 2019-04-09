@@ -30,20 +30,9 @@ class EarlyWorksDoc(Model):
     def short_desc(self):
         return self.description[:80]
 
-    def icon(self):
-        try:
-            if self.file_ext.lower() == 'zip' or self.file_ext.lower() == 'rar':
-                return '<i class="fa fa-file-archive-o" aria-hidden="true"></i>'
-            if self.file_ext[:3].lower() == 'doc':
-                return '<i class="fa fa-file-word-o" aria-hidden="true"></i>' 
-            if self.file_ext.lower() == 'pdf': 
-                return '<i class="fa fa-file-pdf-o" aria-hidden="true"></i>'
-        except:
-            return 'ND'
-
 
     def file_pdf(self):
-        return Markup("<a href='https://report.quasarpm.com/static/assets/midor/ewd/FILES/" + self.contractor_code + '_' + self.revision + ".pdf'" + "download>" + str(self.icon()) + "<a/>")
+        return Markup("<a href='https://report.quasarpm.com/static/assets/midor/ewd/FILES/" + self.contractor_code + '_' + self.revision + ".pdf'" + "download>" + '<i class="fa fa-file-pdf-o" aria-hidden="true"></i>' + "<a/>")
 
 
 
