@@ -2,11 +2,9 @@ from flask import render_template, request
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import ModelView, BaseView, expose
 from app import appbuilder, db
-from .helpers import upload_ewd
-from .models import EarlyWorksDoc
+from .helpers import upload_ewd, upload_correspondence,create_file_list
+from .models import EarlyWorksDoc, Correspondence
 from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual, FilterNotContains
-
-
 
 """
     Create your Views::
@@ -36,6 +34,11 @@ class EarlyWorksDocViewRestricted(ModelView):
     datamodel = SQLAInterface(EarlyWorksDoc)
     list_columns = ['discipline', 'contractor_code','short_desc','file_pdf']
     base_filters = [['unit',FilterNotContains,'11']]
+
+class CorrespondenceView(ModelView):
+    datamodel = SQLAInterface(Correspondence)
+    list_columns = ['document_code','doc_description','file']
+
 """    
     Application wide 404 error handler
 """
@@ -48,6 +51,9 @@ def page_not_found(e):
 appbuilder.add_view(MidorewdDashboardView, "Early Works Document", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
 appbuilder.add_view(EarlyWorksDocView, "EWD Document List", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 appbuilder.add_view(EarlyWorksDocViewRestricted, "EWD Document List PMC", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
+appbuilder.add_view(CorrespondenceView, "Correspondence", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 
-db.create_all()
+db.create_all() 
 #upload_ewd()
+#create_file_list()
+#upload_correspondence()

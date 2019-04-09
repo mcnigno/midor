@@ -1,11 +1,16 @@
 import openpyxl
-from .models import EarlyWorksDoc 
+from .models import EarlyWorksDoc, Correspondence 
 from app import db
 from datetime import datetime
+import os
 
 wb = openpyxl.load_workbook('xlsx/midorewd.xlsx')
 ws = wb.active
 session = db.session
+file_list = []
+error_list = []
+file_dict = {}
+
 def date_parse(date):
     if isinstance(date, int): return datetime.utcfromtimestamp(date)
     if isinstance(date, datetime): return date
@@ -30,6 +35,71 @@ def upload_ewd():
             progressive = row[10].value
         )
         session.add(ewd)
-        print('row added', row[1].value)
+        #print('row added', row[1].value)
     session.commit()
-    print('session committed')
+    #print('session committed')
+
+ 
+def upload_correspondence():
+    file_dict = create_file_list()
+    print('File Dict Len:',len(file_dict))
+    
+    wb = openpyxl.load_workbook('xlsx/correspondence.xlsx')
+    ws = wb.active
+    for row in ws.iter_rows(min_row=10):
+        ext = ''
+        try:
+            ext = check_extension(row[4].value, file_dict)
+        except: 
+            print('Except', row[4].value)
+        crs = Correspondence(
+            type_correspondence = row[0].value,
+            company = row[1].value,
+            unit = row[2].value,
+            discipline = row[3].value,
+            document_code = row[4].value,
+            document_date = row[5].value,
+            doc_description = row[6].value,
+            note = row[7].value,
+            action = row[8].value,
+            expected_date = row[9].value,
+            response = row[10].value,
+            response_date = row[11].value,
+            file_ext = ext
+            )
+        session.add(crs)
+    session.commit()
+
+def create_file_list():
+    file_list = []
+    directory = 'app/static/assets/midor/midor_crs'
+    for root, directories, files in os.walk(directory):
+        #print(root,directories,files)
+        for filename in files:
+            #print(filename)
+            # join the two strings in order to form the full filepath.
+            #  
+            try:
+                file_rad, extension = filename.split('.')
+                file_list.append((file_rad,extension))
+            except:
+                error_list.append(filename)
+    #print('File List')
+    #print(file_list)
+    return dict(file_list)
+    #print(file_dict)
+
+def check_extension(document_code, file_dict):
+    if file_dict:
+        print('ok')
+    try:
+        return file_dict[document_code]
+    except:
+        print('Wrong Extension', document_code)
+        return None
+
+# 
+#upload_correspondence()
+#print(error_list)
+
+

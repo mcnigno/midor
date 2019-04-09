@@ -196,3 +196,15 @@ body > div.container > div > div > div:nth-child(3) > div.table-responsive > tab
     position: relative;
     padding-bottom: 56.25%;
 }
+i.fa.fa-file-pdf-o {
+    font-size: 15pt;
+    color: crimson;
+}
+i.fa.fa-file-archive-o {
+    font-size: 15pt;
+    color: green;
+}
+i.fa.fa-file-word-o {
+    font-size: 15pt;
+    color: cornflowerblue
+}

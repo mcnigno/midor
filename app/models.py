@@ -36,7 +36,35 @@ class EarlyWorksDoc(Model):
 
 
 
+class Correspondence(Model):
+    id = Column(Integer, primary_key=True)
+    type_correspondence = Column(String(50))
+    company = Column(String(255))
+    unit = Column(String(50))
+    discipline = Column(String(255))
+    document_code = Column(String(50))
+    document_date = Column(String(50))
+    doc_description = Column(String(255))
+    note = Column(String(255))
+    action = Column(String(50))
+    expected_date = Column(String(50))
+    response = Column(String(255))
+    response_date = Column(String(50))
+    file_ext = Column(String(20), default='ND')
 
+    def file(self):
+        return Markup("<a href='http://localhost:8080/static/assets/midor/midor_crs/" + self.document_code + '.' + str(self.file_ext) + "'" + "download>"+ str(self.icon()) + "<a/>")
+
+    def icon(self):
+        try:
+            if self.file_ext.lower() == 'zip' or self.file_ext.lower() == 'rar':
+                return '<i class="fa fa-file-archive-o" aria-hidden="true"></i>'
+            if self.file_ext[:3].lower() == 'doc':
+                return '<i class="fa fa-file-word-o" aria-hidden="true"></i>' 
+            if self.file_ext.lower() == 'pdf': 
+                return '<i class="fa fa-file-pdf-o" aria-hidden="true"></i>'
+        except:
+            return 'ND'
 
 
 
