@@ -32,7 +32,7 @@ class EarlyWorksDocView(ModelView):
 
 class EarlyWorksDocViewRestricted(ModelView):
     datamodel = SQLAInterface(EarlyWorksDoc)
-    list_columns = ['discipline', 'contractor_code','short_desc','file_pdf']
+    list_columns = ['discipline', 'contractor_code','short_desc','file']
     base_filters = [['unit',FilterNotContains,'11']]
 
 class CorrespondenceView(ModelView):

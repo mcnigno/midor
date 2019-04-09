@@ -31,7 +31,7 @@ class EarlyWorksDoc(Model):
         return self.description[:80]
 
 
-    def file_pdf(self):
+    def file(self):
         return Markup("<a href='https://report.quasarpm.com/static/assets/midor/ewd/FILES/" + self.contractor_code + '_' + self.revision + ".pdf'" + "download>" + '<i class="fa fa-file-pdf-o" aria-hidden="true"></i>' + "<a/>")
 
 
