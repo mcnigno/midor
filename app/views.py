@@ -3,7 +3,7 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import ModelView, BaseView, expose
 from app import appbuilder, db
 from .helpers import upload_ewd, upload_correspondence,create_file_list
-from .models import EarlyWorksDoc, Correspondence
+from .models import EarlyWorksDoc, Correspondence, Uop_Bpd, Uop_spec
 from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual, FilterNotContains
 
 """
@@ -39,6 +39,17 @@ class CorrespondenceView(ModelView):
     datamodel = SQLAInterface(Correspondence)
     list_columns = ['document_code','doc_description','file']
 
+class Uop_BpdView(ModelView):
+    datamodel = SQLAInterface(Uop_Bpd)
+    list_columns = ['document_code', 'rev', 'doc_description', 'file']
+
+class Uop_SpecView(ModelView):
+    datamodel = SQLAInterface(Uop_spec)
+    label_columns = {
+        'revision':'Rev'
+    }
+    list_columns = ['document_code', 'revision', 'doc_description', 'file']
+    
 """    
     Application wide 404 error handler
 """
@@ -48,10 +59,12 @@ def page_not_found(e):
 
 
 
-appbuilder.add_view(MidorewdDashboardView, "Early Works Document", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
-appbuilder.add_view(EarlyWorksDocView, "EWD Document List", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
-appbuilder.add_view(EarlyWorksDocViewRestricted, "EWD Document List PMC", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
-appbuilder.add_view(CorrespondenceView, "Correspondence", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
+appbuilder.add_view(MidorewdDashboardView, "Early Works Documentation", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
+appbuilder.add_view(EarlyWorksDocView, "Engineering Documents", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
+appbuilder.add_view(EarlyWorksDocViewRestricted, "Engineering Document PMC", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
+appbuilder.add_view(CorrespondenceView, "UOP Correspondence", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
+appbuilder.add_view(Uop_BpdView, "UOP BDP List", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
+appbuilder.add_view(Uop_SpecView, "UOP Std. Specification", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 
 db.create_all() 
 #upload_ewd()

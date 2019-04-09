@@ -1,5 +1,5 @@
 import openpyxl
-from .models import EarlyWorksDoc, Correspondence 
+from .models import EarlyWorksDoc, Correspondence, Uop_Bpd, Uop_spec
 from app import db
 from datetime import datetime
 import os
@@ -70,26 +70,80 @@ def upload_correspondence():
         session.add(crs)
     session.commit()
 
+def upload_uop_bdp():
+    file_dict = create_file_list()
+    print('File Dict Len:',len(file_dict))
+    
+    wb = openpyxl.load_workbook('xlsx/uop_bdp.xlsx')
+    ws = wb.active
+    wrong_ext = []
+    for row in ws.iter_rows(min_row=9):
+        ext = ''
+        try:
+            ext = check_extension(row[0].value, file_dict) 
+            if ext is None:
+                wrong_ext.append(row[0].value)
+
+        except: 
+            print('Except', row[0].value)
+            #wrong_ext.append(row[0].value)
+        crs = Uop_Bpd(
+            document_code = row[0].value,
+            unit = row[1].value,
+            refinery_unit = row[2].value,
+            uop_section = row[3].value,
+            doc_description = row[4].value,
+            rev = row[5].value,
+            file_ext = ext
+            )
+        session.add(crs)
+    session.commit()
+    print('Worng Extension List')
+    print(wrong_ext)
+
+def upload_uop_spec():
+    file_dict = create_file_list()
+    print('File Dict Len:',len(file_dict))
+    
+    wb = openpyxl.load_workbook('xlsx/uop_std_spec.xlsx')
+    ws = wb.active
+    wrong_ext = []
+    for row in ws.iter_rows(min_row=10):
+        ext = ''
+        try:
+            ext = check_extension(row[0].value, file_dict)
+            if ext is None:
+                wrong_ext.append(row[0].value)
+        except: 
+            print('Except', row[0].value)
+        crs = Uop_spec(
+            document_code = row[0].value,
+            document_type = row[1].value,
+            doc_description = row[2].value,
+            revision = row[3].value,
+            file_ext = ext
+            )
+        session.add(crs)
+    session.commit()
+    print('Worng Extension List')
+    print(wrong_ext)
+
+
 def create_file_list():
     file_list = []
-    directory = 'app/static/assets/midor/midor_crs'
+    directory = 'app/static/assets/midor/UOP'
     for root, directories, files in os.walk(directory):
-        #print(root,directories,files)
         for filename in files:
-            #print(filename)
-            # join the two strings in order to form the full filepath.
-            #  
             try:
                 file_rad, extension = filename.split('.')
                 file_list.append((file_rad,extension))
             except:
-                error_list.append(filename)
-    #print('File List')
-    #print(file_list)
+                error_list.append(filename) 
     return dict(file_list)
-    #print(file_dict)
+    
 
 def check_extension(document_code, file_dict):
+    
     if file_dict:
         print('ok')
     try:
@@ -101,5 +155,6 @@ def check_extension(document_code, file_dict):
 # 
 #upload_correspondence()
 #print(error_list)
-
+#upload_uop_bdp()
+#upload_uop_spec() 
 

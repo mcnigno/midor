@@ -67,4 +67,51 @@ class Correspondence(Model):
             return 'ND'
 
 
+'UOP BDP Section	Doc. Description	Rev'
 
+class Uop_Bpd(Model):
+    id = Column(Integer, primary_key=True)
+    document_code = Column(String(50))
+    unit = Column(String(50))
+    refinery_unit = Column(String(50))
+    uop_section = Column(String(50))
+    doc_description = Column(String(255))
+    rev = Column(String(50))
+    file_ext = Column(String(20), default='ND')
+
+    def file(self):
+        return Markup("<a href='https://midor.quasarpm.com/static/assets/midor/UPO/" + self.document_code + '.' + str(self.file_ext) + "'" + "download>"+ str(self.icon()) + "<a/>")
+
+    def icon(self):
+        try:
+            if self.file_ext.lower() == 'zip' or self.file_ext.lower() == 'rar':
+                return '<i class="fa fa-file-archive-o" aria-hidden="true"></i>'
+            if self.file_ext[:3].lower() == 'doc':
+                return '<i class="fa fa-file-word-o" aria-hidden="true"></i>' 
+            if self.file_ext.lower() == 'pdf': 
+                return '<i class="fa fa-file-pdf-o" aria-hidden="true"></i>'
+        except:
+            return 'ND'
+
+'Document Code	Document type	Description	Revision'
+class Uop_spec(Model):
+    id = Column(Integer, primary_key=True)
+    document_code = Column(String(50))
+    document_type = Column(String(50))
+    doc_description = Column(String(255))
+    revision = Column(String(50))
+    file_ext = Column(String(20), default='ND')
+
+    def file(self):
+        return Markup("<a href='https://midor.quasarpm.com/static/assets/midor/UPO/" + self.document_code + '.' + str(self.file_ext) + "'" + "download>"+ str(self.icon()) + "<a/>")
+
+    def icon(self):
+        try:
+            if self.file_ext.lower() == 'zip' or self.file_ext.lower() == 'rar':
+                return '<i class="fa fa-file-archive-o" aria-hidden="true"></i>'
+            if self.file_ext[:3].lower() == 'doc':
+                return '<i class="fa fa-file-word-o" aria-hidden="true"></i>' 
+            if self.file_ext.lower() == 'pdf': 
+                return '<i class="fa fa-file-pdf-o" aria-hidden="true"></i>'
+        except:
+            return 'ND'
