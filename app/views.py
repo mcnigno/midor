@@ -61,7 +61,7 @@ def page_not_found(e):
 
 appbuilder.add_view(MidorewdDashboardView, "Early Works Documentation", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
 appbuilder.add_view(EarlyWorksDocView, "Engineering Documents", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
-appbuilder.add_view(EarlyWorksDocViewRestricted, "Engineering Document PMC", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
+appbuilder.add_view(EarlyWorksDocViewRestricted, "Engineering Documents PMC", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 appbuilder.add_view(CorrespondenceView, "UOP Correspondence", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 appbuilder.add_view(Uop_BpdView, "UOP BDP List", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 appbuilder.add_view(Uop_SpecView, "UOP Std. Specification", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
