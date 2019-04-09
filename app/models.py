@@ -53,7 +53,7 @@ class Correspondence(Model):
     file_ext = Column(String(20), default='ND')
 
     def file(self):
-        return Markup("<a href='http://localhost:8080/static/assets/midor/midor_crs/" + self.document_code + '.' + str(self.file_ext) + "'" + "download>"+ str(self.icon()) + "<a/>")
+        return Markup("<a href='https://midor.quasarpm.com/static/assets/midor/midor_crs/" + self.document_code + '.' + str(self.file_ext) + "'" + "download>"+ str(self.icon()) + "<a/>")
 
     def icon(self):
         try:
