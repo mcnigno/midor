@@ -3,15 +3,12 @@
 {% block head_css %}
     {{ super() }}
     <link rel="stylesheet" href="{{url_for('static',filename='css/mycss.css')}}"></link>
-    <link rel="stylesheet" href="{{url_for('static',filename='css/dropzone.css')}}"></link>
 
     {% endblock %}
 
 {% block head_js %}
     {{ super() }}
-    <script src="{{url_for('static',filename='js/moment.js')}}"></script>
-    <script src="{{url_for('static',filename='js/dropzone.js')}}"></script>
- 
+   
 
     {% endblock %}
 
