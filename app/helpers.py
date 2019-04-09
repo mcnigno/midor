@@ -99,7 +99,7 @@ def check_extension(document_code, file_dict):
         return None
 
 # 
-upload_correspondence()
+#upload_correspondence()
 #print(error_list)
 
 
