@@ -156,5 +156,5 @@ def check_extension(document_code, file_dict):
 #upload_correspondence()
 #print(error_list)
 #upload_uop_bdp()
-upload_uop_spec() 
+#upload_uop_spec() 
 

@@ -1,0 +1,23 @@
+{% extends "appbuilder/base.html" %}
+{% import 'appbuilder/general/lib.html' as lib %}
+
+{% block content %}
+<div> 
+    <H4>EARLY WORKS ENGINEERING INDEX: <a href= 'https://midor.quasarpm.com/static/assets/index/2544-ATT C-APP 8-1_updated_11-10-18.xlsx' download><i style="font-size:20pt !important; color: green;" class="fa fa-file-excel-o" aria-hidden="true"></i></a></H4> 
+</div>
+{{ lib.panel_begin(title) }}
+
+    {% block list_search scoped %}
+        {% call lib.accordion_tag("accordion1",_("Search"), False) %}
+            {{ widgets.get('search')()|safe }}
+        {% endcall %}
+    {% endblock %}
+
+    {% block list_list scoped %}
+        <div>
+        {{ widgets.get('list')()|safe }}
+        </div>
+    {% endblock %}
+{{ lib.panel_end() }}
+
+{% endblock %}

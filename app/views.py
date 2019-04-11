@@ -28,20 +28,24 @@ class MidorewdDashboardView(BaseView):
 class EarlyWorksDocView(ModelView):
     datamodel = SQLAInterface(EarlyWorksDoc)
     list_columns = ['discipline', 'contractor_code','short_desc','file']
-    #show_template = 'custom/showdoc.html'               
+    #show_template = 'custom/showdoc.html'
+    list_template = 'listEwd.html'              
 
 class EarlyWorksDocViewRestricted(ModelView):
     datamodel = SQLAInterface(EarlyWorksDoc)
     list_columns = ['discipline', 'contractor_code','short_desc','file']
     base_filters = [['unit',FilterNotContains,'11']]
+    list_template = 'listEwd.html'
 
 class CorrespondenceView(ModelView):
     datamodel = SQLAInterface(Correspondence)
     list_columns = ['document_code','doc_description','file']
+    list_template = 'listCrs.html'
 
 class Uop_BpdView(ModelView):
     datamodel = SQLAInterface(Uop_Bpd)
     list_columns = ['document_code', 'rev', 'doc_description', 'file']
+    list_template = 'listUop_bdp.html'
 
 class Uop_SpecView(ModelView):
     datamodel = SQLAInterface(Uop_spec)
@@ -49,7 +53,7 @@ class Uop_SpecView(ModelView):
         'revision':'Rev'
     }
     list_columns = ['document_code', 'revision', 'doc_description', 'file']
-    
+    list_template = 'listUop_spec.html' 
 """    
     Application wide 404 error handler
 """
