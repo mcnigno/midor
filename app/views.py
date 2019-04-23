@@ -6,18 +6,16 @@ from .helpers import upload_ewd, upload_correspondence,create_file_list
 from .models import EarlyWorksDoc, Correspondence, Uop_Bpd, Uop_spec
 from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual, FilterNotContains
 
+
+
 """
-    Create your Views::
+    DRASS Comments View Section
+"""
+from app.comments.views import DocumentView, RevisionView, CommentSheetView
 
 
-    class MyModelView(ModelView):
-        datamodel = SQLAInterface(MyModel)
-
-
-    Next, register your Views::
-
-
-    appbuilder.add_view(MyModelView, "My View", icon="fa-folder-open-o", category="My Category", category_icon='fa-envelope')
+"""
+    Early Works View Section 
 """
 class MidorewdDashboardView(BaseView):
     default_view = 'midorewd'
@@ -54,6 +52,7 @@ class Uop_SpecView(ModelView):
     }
     list_columns = ['document_code', 'revision', 'doc_description', 'file']
     list_template = 'listUop_spec.html' 
+
 """    
     Application wide 404 error handler
 """
@@ -69,6 +68,12 @@ appbuilder.add_view(EarlyWorksDocViewRestricted, "Engineering Documents PMC", ic
 appbuilder.add_view(CorrespondenceView, "Correspondence", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 appbuilder.add_view(Uop_BpdView, "UOP BDP List", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 appbuilder.add_view(Uop_SpecView, "UOP Std. Specification", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
+
+
+
+#appbuilder.add_view(RevisionView,'Revision',icon="fa-folder-open-o", category="DRAS", category_icon='fa-envelope')
+
+
 
 db.create_all() 
 #upload_ewd()

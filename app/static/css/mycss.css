@@ -208,3 +208,40 @@ i.fa.fa-file-word-o {
     font-size: 15pt;
     color: cornflowerblue
 }
+#comment_row_ownerCommentComment{
+    background-color: rgba(226, 238, 232, 0.308);
+    width: 250px;
+    padding: 10px;
+}
+#comment_row_contractorReplyComment{
+    background-color: rgba(241, 241, 228, 0.301);
+    width: 250px;
+}
+#comment_row_ownerCounterReplyComment{
+    background-color: rgba(207, 208, 221, 0.301);
+    width: 250px;
+}
+
+.revision {
+    text-align: center;
+}
+
+.Final{
+    background-color: #738b9473 !important;
+    
+    
+}
+.RevCardTitle {
+    background-color: rgb(41, 110, 167);
+    text-align: center;
+    color: white;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+.name, .stage_class {
+    display: none;
+}
+.current_cs {
+    display: inline-flex;
+    color: #d3272e;
+}

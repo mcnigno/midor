@@ -19,6 +19,7 @@ def date_parse(date):
 
     return datetime.strptime(date,'%d/%m/%y')
 
+
 def upload_ewd():
     for row in ws.iter_rows(min_row=2):
         ewd = EarlyWorksDoc(
@@ -70,6 +71,7 @@ def upload_correspondence():
         session.add(crs)
     session.commit()
 
+
 def upload_uop_bdp():
     file_dict = create_file_list()
     print('File Dict Len:',len(file_dict))
@@ -100,6 +102,7 @@ def upload_uop_bdp():
     session.commit()
     print('Worng Extension List')
     print(wrong_ext)
+
 
 def upload_uop_spec():
     file_dict = create_file_list()
