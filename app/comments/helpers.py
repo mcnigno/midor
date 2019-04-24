@@ -254,7 +254,9 @@ def get_data_from_cs(item):
         
 
         item.ownerTransmittalReference = csSheet['C9'].value
+        print('*********************** BEFORE DATE PARSE')
         item.ownerTransmittalDate = date_parse(csSheet['D9'].value)
+        print('*********************** DATE PARSE')
         item.response_status = csSheet['C12'].value
 
         item.contractorTransmittalReference = csSheet['H8'].value
