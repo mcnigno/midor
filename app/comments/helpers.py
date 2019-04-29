@@ -283,14 +283,11 @@ def get_data_from_cs(item):
         for cs in commentSheets:
             cs.current = False
 
-    
-    for row in csSheet.iter_rows(min_row=17,min_col=2):
-
-        try:
+    try:
+        for row in csSheet.iter_rows(min_row=17,min_col=2):
             if row[0].value is not None:
                 #print(row[0].value) 
                 comment = Comment(
-
                     revision_id = rev.id,
                     commentsheet = item,
 
@@ -322,17 +319,15 @@ def get_data_from_cs(item):
                 #print('Contractor Status:',len(comment.contractorReplyStatus),comment.contractorReplyStatus)
                 session.add(comment)
         #session.query(Comment).filter(Comment.document_id == doc.id).delete()
-        
+
         #print('maybe here')
         session.commit()
         #print('after commit')
         #return True
-        
-        except:
-            abort(400,'Error - Data in Table badly formatted :( - check your file !')
     
-        
-            
+    except:
+        abort(400,'Error - Data in Table badly formatted :( - check your file !')
+     
 
 def find_rev():
     session = db.session
