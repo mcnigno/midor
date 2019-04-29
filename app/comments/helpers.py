@@ -286,51 +286,51 @@ def get_data_from_cs(item):
     
     for row in csSheet.iter_rows(min_row=17,min_col=2):
 
+        try:
+            if row[0].value is not None:
+                #print(row[0].value) 
+                comment = Comment(
+
+                    revision_id = rev.id,
+                    commentsheet = item,
+
+                    pos = row[0].value,
+                    tag = row[1].value,
+                    info = row[2].value,
+                    ownerCommentBy = row[3].value,
+                    ownerCommentDate = date_parse(csSheet['F15'].value),
+                    ownerCommentComment = row[4].value,
+
+                    contractorReplyDate = date_parse(csSheet['H15'].value),
+                    contractorReplyStatus = row[5].value,
+                    contractorReplyComment = row[6].value,
+                    
+                    ownerCounterReplyDate = date_parse(csSheet['J15'].value),
+                    ownerCounterReplyComment = row[7].value,
+
+                    finalAgreementDate = date_parse(csSheet['L15'].value),
+                    finalAgreemntCommentDate = date_parse(row[8].value),
+                    finalAgreementComment = row[9].value,
+
+                    commentStatus = row[10].value,
+                )
+                if item.current:
+                    
+                    comment.document_id = doc.id
+                    
+
+                #print('Contractor Status:',len(comment.contractorReplyStatus),comment.contractorReplyStatus)
+                session.add(comment)
+        #session.query(Comment).filter(Comment.document_id == doc.id).delete()
+        
+        #print('maybe here')
+        session.commit()
+        #print('after commit')
+        #return True
+        
+        except:
+            abort(400,'Error - Data in Table badly formatted :( - check your file !')
     
-        if row[0].value is not None:
-            #print(row[0].value) 
-            comment = Comment(
-
-                revision_id = rev.id,
-                commentsheet = item,
-
-                pos = row[0].value,
-                tag = row[1].value,
-                info = row[2].value,
-                ownerCommentBy = row[3].value,
-                ownerCommentDate = date_parse(csSheet['F15'].value),
-                ownerCommentComment = row[4].value,
-
-                contractorReplyDate = date_parse(csSheet['H15'].value),
-                contractorReplyStatus = row[5].value,
-                contractorReplyComment = row[6].value,
-                
-                ownerCounterReplyDate = date_parse(csSheet['J15'].value),
-                ownerCounterReplyComment = row[7].value,
-
-                finalAgreementDate = date_parse(csSheet['L15'].value),
-                finalAgreemntCommentDate = date_parse(row[8].value),
-                finalAgreementComment = row[9].value,
-
-                commentStatus = row[10].value,
-            )
-            if item.current:
-                
-                comment.document_id = doc.id
-                
-
-            print('Contractor Status:',len(comment.contractorReplyStatus),comment.contractorReplyStatus)
-            session.add(comment)
-    #session.query(Comment).filter(Comment.document_id == doc.id).delete()
-    
-    print('maybe here')
-    session.commit()
-    print('after commit')
-    #return True
-    '''
-    except:
-        abort(400,'Error - Data in Table badly formatted :( - check your file !')
-    '''
         
             
 
