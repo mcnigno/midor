@@ -247,89 +247,90 @@ def get_data_from_cs(item):
     print('***********************')
     print(csSheet['C9'].value)
     
-    try:
-        print('before maybe here')
-        item.revision_id = rev.id
-        item.document_id = doc.id
+    
+    print('before maybe here')
+    item.revision_id = rev.id
+    item.document_id = doc.id
+    
+
+    item.ownerTransmittalReference = csSheet['C9'].value
+    print('*********************** BEFORE DATE PARSE')
+    item.ownerTransmittalDate = date_parse(csSheet['D9'].value)
+    print('*********************** DATE PARSE')
+    item.response_status = csSheet['C12'].value
+
+    item.contractorTransmittalReference = csSheet['H8'].value
+    item.contractorTransmittalDate = date_parse(csSheet['H9'].value)
+    item.contractorTransmittalMr = csSheet['H10'].value
+    item.contractorTransmittalVendor = csSheet['H11'].value
+
+    item.documentReferenceDoc = csSheet['K8'].value
+    item.documentReferenceRev = csSheet['K9'].value
+    item.documentReferenceDesc = csSheet['K10'].value
+    item.documentReferenceBy = csSheet['K11'].value
+    
+    
+    '''
+    BODY - CREATE NEW COMMENTS FOR THIS CS
+    '''
+    
+    if item.current:
+        session.query(Comment).filter(Comment.document_id == doc.id).delete()
         
+        commentSheets = session.query(Commentsheet).filter(Revision.name == revision).all()
+        item.stage = rev_stage
 
-        item.ownerTransmittalReference = csSheet['C9'].value
-        print('*********************** BEFORE DATE PARSE')
-        item.ownerTransmittalDate = date_parse(csSheet['D9'].value)
-        print('*********************** DATE PARSE')
-        item.response_status = csSheet['C12'].value
+        for cs in commentSheets:
+            cs.current = False
 
-        item.contractorTransmittalReference = csSheet['H8'].value
-        item.contractorTransmittalDate = date_parse(csSheet['H9'].value)
-        item.contractorTransmittalMr = csSheet['H10'].value
-        item.contractorTransmittalVendor = csSheet['H11'].value
+    
+    for row in csSheet.iter_rows(min_row=17,min_col=2):
 
-        item.documentReferenceDoc = csSheet['K8'].value
-        item.documentReferenceRev = csSheet['K9'].value
-        item.documentReferenceDesc = csSheet['K10'].value
-        item.documentReferenceBy = csSheet['K11'].value
-        
-        
-        '''
-        BODY - CREATE NEW COMMENTS FOR THIS CS
-        '''
-        
-        if item.current:
-            session.query(Comment).filter(Comment.document_id == doc.id).delete()
-            
-            commentSheets = session.query(Commentsheet).filter(Revision.name == revision).all()
-            item.stage = rev_stage
+    
+        if row[0].value is not None:
+            #print(row[0].value) 
+            comment = Comment(
 
-            for cs in commentSheets:
-                cs.current = False
+                revision_id = rev.id,
+                commentsheet = item,
 
-        
-        for row in csSheet.iter_rows(min_row=17,min_col=2):
- 
-        
-            if row[0].value is not None:
-                #print(row[0].value) 
-                comment = Comment(
+                pos = row[0].value,
+                tag = row[1].value,
+                info = row[2].value,
+                ownerCommentBy = row[3].value,
+                ownerCommentDate = date_parse(csSheet['F15'].value),
+                ownerCommentComment = row[4].value,
 
-                    revision_id = rev.id,
-                    commentsheet = item,
+                contractorReplyDate = date_parse(csSheet['H15'].value),
+                contractorReplyStatus = row[5].value,
+                contractorReplyComment = row[6].value,
+                
+                ownerCounterReplyDate = date_parse(csSheet['J15'].value),
+                ownerCounterReplyComment = row[7].value,
 
-                    pos = row[0].value,
-                    tag = row[1].value,
-                    info = row[2].value,
-                    ownerCommentBy = row[3].value,
-                    ownerCommentDate = date_parse(csSheet['F15'].value),
-                    ownerCommentComment = row[4].value,
+                finalAgreementDate = date_parse(csSheet['L15'].value),
+                finalAgreemntCommentDate = date_parse(row[8].value),
+                finalAgreementComment = row[9].value,
 
-                    contractorReplyDate = date_parse(csSheet['H15'].value),
-                    contractorReplyStatus = row[5].value,
-                    contractorReplyComment = row[6].value,
-                    
-                    ownerCounterReplyDate = date_parse(csSheet['J15'].value),
-                    ownerCounterReplyComment = row[7].value,
+                commentStatus = row[10].value,
+            )
+            if item.current:
+                
+                comment.document_id = doc.id
+                
 
-                    finalAgreementDate = date_parse(csSheet['L15'].value),
-                    finalAgreemntCommentDate = date_parse(row[8].value),
-                    finalAgreementComment = row[9].value,
-
-                    commentStatus = row[10].value,
-                )
-                if item.current:
-                    
-                    comment.document_id = doc.id
-                    
-
-                print(comment.id, comment.document_id,comment.revision_id, comment.commentsheet)
-                session.add(comment)
-        #session.query(Comment).filter(Comment.document_id == doc.id).delete()
-        
-        print('maybe here')
-        session.commit()
-        print('after commit')
-        #return True
+            print(comment.id, comment.document_id,comment.revision_id, comment.commentsheet)
+            session.add(comment)
+    #session.query(Comment).filter(Comment.document_id == doc.id).delete()
+    
+    print('maybe here')
+    session.commit()
+    print('after commit')
+    #return True
+    '''
     except:
         abort(400,'Error - Data in Table badly formatted :( - check your file !')
-
+    '''
         
             
 
