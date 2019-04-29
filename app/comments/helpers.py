@@ -319,13 +319,14 @@ def get_data_from_cs(item):
                     comment.document_id = doc.id
                     
 
-  
+                print('comment.id, comment.document_id,comment.revision_id', comment.commentsheet)
                 session.add(comment)
         #session.query(Comment).filter(Comment.document_id == doc.id).delete()
         
         print('maybe here')
         session.commit()
-        return True
+        print('after commit')
+        #return True
     except:
         abort(400,'Error - Data in Table badly formatted :( - check your file !')
 
