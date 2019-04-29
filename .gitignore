@@ -3,3 +3,4 @@ venv
 app/static/assets/midor
 *.pyc
 env
+app/static/uploads
