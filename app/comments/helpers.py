@@ -285,6 +285,7 @@ def get_data_from_cs(item):
 
     try:
         for row in csSheet.iter_rows(min_row=17,min_col=2):
+            print('CommentStatus', row[0].value,row[9].value,row[10].value,row[11].value, type(row[11].value))
             if row[0].value is not None:
                 #print(row[0].value) 
                 comment = Comment(
@@ -306,18 +307,18 @@ def get_data_from_cs(item):
                     ownerCounterReplyComment = row[7].value,
 
                     finalAgreementDate = date_parse(csSheet['L15'].value),
-                    finalAgreemntCommentDate = date_parse(row[8].value),
-                    finalAgreementComment = row[9].value,
+                    finalAgreemntCommentDate = date_parse(row[9].value),
+                    finalAgreementComment = row[10].value,
 
-                    commentStatus = row[10].value,
+                    commentStatus = str(row[11].value),
                 )
-                if item.current:
+                if item.current:  
                     
                     comment.document_id = doc.id
                     
 
                 #print('Contractor Status:',len(comment.contractorReplyStatus),comment.contractorReplyStatus)
-            session.add(comment)
+                session.add(comment)
         #session.query(Comment).filter(Comment.document_id == doc.id).delete()
 
         #print('maybe here')

@@ -14,7 +14,8 @@ from .helpers import update_data_from_cs
  
 class CommentView(ModelView):
     datamodel = SQLAInterface(Comment)
-    list_columns = ['ownerCommentComment','contractorReplyComment','ownerCounterReplyComment']
+    list_columns = ['ownerCommentComment','contractorReplyComment','ownerCounterReplyComment','finalComment', 'commentStatus', 'pos']
+    
     list_widget = commentListWidget
     label_columns = {
         'ownerCommentBy': 'Owner',

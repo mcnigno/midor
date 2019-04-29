@@ -121,12 +121,17 @@ class Comment(Model, AuditMixin):
 
     finalAgreementDate = Column(Date)
     finalAgreemntCommentDate = Column(Date)
-    finalAgreementComment = Column(Text)
+    finalAgreementComment = Column(Text) 
 
-    commentStatus = Column(String(20))
+    commentStatus = Column(String(20)) 
 
     def __repr__(self):
         return self.id
+
+    def finalComment(self):
+        if self.finalAgreementComment:
+            return self.finalAgreementComment 
+        return 'Without Comments.'
 
 
 

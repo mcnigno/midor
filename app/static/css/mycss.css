@@ -209,17 +209,22 @@ i.fa.fa-file-word-o {
     color: cornflowerblue
 }
 #comment_row_ownerCommentComment{
-    background-color: rgba(226, 238, 232, 0.308);
-    width: 250px;
-    padding: 10px;
+    background-color: rgb(241, 241, 244);
+    width: 30%;
+    padding: 15px;
+    text-align: justify;
 }
 #comment_row_contractorReplyComment{
     background-color: rgba(241, 241, 228, 0.301);
-    width: 250px;
+    width: 30%;
+    text-align: justify;
+    padding: 15px;
 }
 #comment_row_ownerCounterReplyComment{
-    background-color: rgba(207, 208, 221, 0.301);
-    width: 250px;
+    background-color: rgb(241, 241, 244);
+    width: 30%;
+    text-align: justify;
+    padding: 15px;
 }
 
 .revision {
@@ -244,4 +249,11 @@ i.fa.fa-file-word-o {
 .current_cs {
     display: inline-flex;
     color: #aaa;
+}
+.finalComment{
+    text-align: center;
+    background-color: #2e2e2e2e;
+}
+.final-comment-footer{
+    height: 20px;
 }

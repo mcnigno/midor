@@ -21,21 +21,24 @@
             <th class="col-md-1 col-lg-1 col-sm-1" ></th>
         {% endif %}
 
-        {% for item in include_columns %}
-            {% if item in order_columns %}
-                {% set res = item | get_link_order(modelview_name) %}
-                    {% if res == 2 %}
-                    <th><a href={{ item | link_order(modelview_name) }}>{{label_columns.get(item)}}
-                    <i class="fa fa-chevron-up pull-right"></i></a></th>
-                {% elif res == 1 %}
-                    <th><a href={{ item | link_order(modelview_name) }}>{{label_columns.get(item)}}
-                    <i class="fa fa-chevron-down pull-right"></i></a></th>
+        {% set commentlist = ['ownerCommentComment', 'contractorReplyComment','ownerCounterReplyComment' ] %}
+        {% for item in commentlist %}
+            {% if item != 'commentStatus' and item != 'finalComment' %}   
+                {% if item in order_columns %}
+                    {% set res = item | get_link_order(modelview_name) %}
+                        {% if res == 2 %}
+                        <th><a href={{ item | link_order(modelview_name) }}>{{label_columns.get(item)}}
+                        <i class="fa fa-chevron-up pull-right"></i></a></th>
+                    {% elif res == 1 %}
+                        <th><a href={{ item | link_order(modelview_name) }}>{{label_columns.get(item)}}
+                        <i class="fa fa-chevron-down pull-right"></i></a></th>
+                    {% else %}
+                        <th><a href={{ item | link_order(modelview_name) }}>{{label_columns.get(item)}}
+                        <i class="fa fa-arrows-v pull-right"></i></a></th>
+                    {% endif %}
                 {% else %}
-                    <th><a href={{ item | link_order(modelview_name) }}>{{label_columns.get(item)}}
-                    <i class="fa fa-arrows-v pull-right"></i></a></th>
+                    <th>{{label_columns.get(item)}}</th>
                 {% endif %}
-            {% else %}
-                <th>{{label_columns.get(item)}}</th>
             {% endif %}
         {% endfor %}
         
@@ -59,19 +62,38 @@
                     {{ lib.btn_crud(can_show, can_edit, can_delete, pk, modelview_name, filters) }}
                     </center></td>
                 {% endif %}
-                    
-                {% for value in include_columns %}
-                    {% set formatter = formatters_columns.get(value) %}
-                    {% if formatter %}
-                    
-                        <td id='comment_row_{{value}}'>{{ formatter(item[value]) }}</td>
-                    {% else %}
-                    
-                        <td id='comment_row_{{value}}'>{{ item[value] }}</td>
-                    {% endif %}
-                {% endfor %}
+                
+                
+                    {% set commentlist = ['ownerCommentComment', 'contractorReplyComment','ownerCounterReplyComment' ] %}
+                    {% for value in commentlist %}
+                        {% set formatter = formatters_columns.get(value) %}
+
+                        {% if value != 'commentStatus' and value != 'finalComment' and value != 'pos' %}
+
+                            {% if formatter %}
+                            
+                                <td id='comment_row_{{value}}'>{{ formatter(item[value]) }}</td>
+                            {% else %}
+                            
+                                <td id='comment_row_{{value}}'>{{ item[value] }}</td>
+                                
+                                
+                            {% endif %}
+                        {% endif %}
+                        
+                    {% endfor %}
+                
+                
                 
             </tr>
+            
+            <tr class="final-comment">
+
+                <td colspan="2" ><strong> {{ item['pos']}} </strong></td>
+                <td colspan="3" class="finalComment"><strong> {{ item['commentStatus']}} </strong> {{ item['finalComment'] }}</td>
+            
+            </tr>
+            <tr class="final-comment-footer"></tr>
             
         {% endfor %}
         
