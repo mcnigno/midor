@@ -113,7 +113,7 @@ class Comment(Model, AuditMixin):
     ownerCommentComment = Column(Text)
 
     contractorReplyDate = Column(Date)
-    contractorReplyStatus = Column(String(50))
+    contractorReplyStatus = Column(String(100))
     contractorReplyComment = Column(Text)
     
     ownerCounterReplyDate = Column(Date)
