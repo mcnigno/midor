@@ -319,7 +319,7 @@ def get_data_from_cs(item):
                 comment.document_id = doc.id
                 
 
-            print(comment.id, comment.document_id,comment.revision_id, comment.commentsheet)
+            print('Contractor Status:',len(contractorReplyStatus),contractorReplyStatus)
             session.add(comment)
     #session.query(Comment).filter(Comment.document_id == doc.id).delete()
     
