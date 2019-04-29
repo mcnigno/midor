@@ -317,7 +317,7 @@ def get_data_from_cs(item):
                     
 
                 #print('Contractor Status:',len(comment.contractorReplyStatus),comment.contractorReplyStatus)
-                session.add(comment)
+            session.add(comment)
         #session.query(Comment).filter(Comment.document_id == doc.id).delete()
 
         #print('maybe here')
