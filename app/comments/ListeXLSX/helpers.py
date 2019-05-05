@@ -3,13 +3,15 @@ import openpyxl
 from app import db
 from app.models import (Mocmodel, Unitmodel, Dedocmodel,
                 Splitofworks, Disciplinedras, Drascommentsheet,
-                Drasissuetype, Drasactionrequired)
+                Drasissuetype, Drasactionrequired, Drascomment,
+                Drasrevision, Drasdocument)
 from app.comments.helpers import get_data_from_cs, get_fake_data_from_cs, get_fake_data_from_cs2
 from config import UPLOAD_FOLDER
 import uuid
 from flask_appbuilder.filemanager import FileManager
 from flask import current_app
 import random
+#from app.comments.ListeXLSX.helpers import fakeItem3
 
 path = 'app/comments/ListeXLSX/OperatingCenter.xlsx'
 workbook = openpyxl.load_workbook(path)
@@ -166,7 +168,12 @@ def splitOfWorks():
 
 def init_dras():
     session = db.session
-    
+
+    session.query(Drascomment).delete()
+    session.query(Drascommentsheet).delete()
+    session.query(Drasrevision).delete()
+    session.query(Drasdocument).delete()
+
     session.query(Drasactionrequired).delete()
     session.query(Drasissuetype).delete()
 
@@ -205,7 +212,7 @@ def init_dras():
     print('                ok    Init is Done')
   
 #init_dras()
-
+#fakeItem3(100)
 
 ##
 ##  Test
