@@ -536,7 +536,7 @@ def get_fake_data_from_cs2(item):
         discipline = csSheet['K11'].value
         #print('DOC is NONE *-----------           ************')
         moc, dedoc = get_oc(oc_unit, discipline)
-        #print('MOC - DEDOC ', moc, dedoc)
+        print('MOC - DEDOC ', moc, dedoc)
         doc = Drasdocument(name=document, 
                         moc_id=moc, 
                         dedoc_id=dedoc,
@@ -580,8 +580,8 @@ def get_fake_data_from_cs2(item):
         HEADER - UPDATE THE COMMENT SHEET
     '''
 
-    item.revision_id = rev.id
-    item.document_id = doc.id
+    item.drasrevision_id = rev.id
+    item.drasdocument_id = doc.id
 
     item.ownerTransmittalReference = csSheet['C9'].value
     item.ownerTransmittalDate = date_parse(csSheet['D9'].value)
@@ -656,7 +656,7 @@ def get_fake_data_from_cs2(item):
                 )
                 if item.current:  
                     
-                    comment.document_id = doc.id
+                    comment.drasdocument_id = doc.id
                     
 
                 #print('Contractor Status:',len(comment.contractorReplyStatus),comment.contractorReplyStatus)

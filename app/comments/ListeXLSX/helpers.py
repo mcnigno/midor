@@ -422,6 +422,6 @@ def fakeItem3(times):
 #fakeItem2(['0020','0054'])
 #fakeItem3(99)
  
-
-#init_dras()
-fakeItem3(100)
+ 
+init_dras()
+#fakeItem3(1)
