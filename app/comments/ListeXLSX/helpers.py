@@ -11,7 +11,6 @@ import uuid
 from flask_appbuilder.filemanager import FileManager
 from flask import current_app
 import random
-#from app.comments.ListeXLSX.helpers import fakeItem3
 
 path = 'app/comments/ListeXLSX/OperatingCenter.xlsx'
 workbook = openpyxl.load_workbook(path)
@@ -211,8 +210,7 @@ def init_dras():
     
     print('                ok    Init is Done')
   
-init_dras()
-#fakeItem3(100)
+
 
 ##
 ##  Test
@@ -424,4 +422,6 @@ def fakeItem3(times):
 #fakeItem2(['0020','0054'])
 #fakeItem3(99)
  
-     
+
+#init_dras()
+fakeItem3(100)

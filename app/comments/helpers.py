@@ -356,9 +356,6 @@ def get_data_from_cs(item):
         abort(400,'Error - Data in Table badly formatted :( - check your file !')
      
 
-
-
-
 def get_fake_data_from_cs(item):
     #item ='4def885a-604b-11e9-bffd-ac87a32187da_sep_DRAS_2544-17-DW-0510-04_CY.xlsx'
     session = db.session
