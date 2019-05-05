@@ -403,6 +403,6 @@ appbuilder.add_view(SowView, 'Split of Works',
 
 
 
-
+db.create_all()
 
 #add_moc()

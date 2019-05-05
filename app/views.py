@@ -12,7 +12,7 @@ from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFu
     DRASS Comments View Section
 """
 from app.comments.views import DocumentView, RevisionView, CommentSheetView
-
+import app.comments.views
 
 """
     Early Works View Section 
