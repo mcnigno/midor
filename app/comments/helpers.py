@@ -1,10 +1,11 @@
 
 from config import UPLOAD_FOLDER
 import openpyxl
-from .models import Document, Revision, Commentsheet, Comment
+from .models import Document, Revision, Commentsheet, Comment, SplitOfWorks, Unit, Discipline
 from datetime import datetime
 from flask import flash, abort
 from app import db
+from random import randint
 
 
 def date_parse(field):
@@ -135,12 +136,12 @@ def update_data_from_cs(item):
         doc = session.query(Document).filter(Document.name == document).first()
         session.query(Comment).filter(Comment.document_id == doc.id).delete()
         
-        cs = session.query(Commentsheet).filter( 
+        cs_list = session.query(Commentsheet).filter( 
                                     Document.id == doc.id,
-                                    Commentsheet.current == True).first()
+                                    Commentsheet.current == True).all()
         #item.stage = rev_stage
-          
-        cs.current = False
+        for cs in cs_list:  
+            cs.current = False
         print('cs', cs.current, cs.id, 'item',item.current, item.id)
         item.current = True
         print('cs', cs.current, cs.id, 'item',item.current, item.id)
@@ -197,7 +198,22 @@ def update_data_from_cs(item):
         abort(400,'Error - Data in Table badly formatted :( - check your file !')
 
 
+def get_oc(unit, discipline):
+    session = db.session
+    unit_id = session.query(Unit).filter(Unit.code == unit).first()
+    discipline_id = session.query(Discipline).filter(Discipline.name == discipline).first()
+    
+    if unit_id and discipline_id:
+        splitOfWorks = session.query(SplitOfWorks).filter(
+                    SplitOfWorks.unit_id == unit_id.id,
+                    SplitOfWorks.discipline_id == discipline_id.id).first()
+    
+        return unit_id.moc_id, splitOfWorks.oc_id
+    if unit_id:
+        return unit_id.moc_id, unit_id.dedoc_id
+    return abort(400,'Unit not Found, check your file name.')
 
+ 
 def get_data_from_cs(item):
     #item ='4def885a-604b-11e9-bffd-ac87a32187da_sep_DRAS_2544-17-DW-0510-04_CY.xlsx'
     session = db.session
@@ -217,46 +233,53 @@ def get_data_from_cs(item):
         revision = full_revision[:full_revision.index('Y')]
         rev_stage = full_revision[full_revision.index('Y'):]
 
+        oc_unit = document.split('-')[1]
+        project = document.split('-')[0] 
+
     except:
         abort(400, 'Error in file name. Check Your File!')
 
     doc = session.query(Document).filter(Document.name == document).first()
+    
     if doc is None:
-        doc = Document(name=document)
+        #fake Discipline
+        
+        discipline = csSheet['K11'].value
+
+        print('DOC is NONE *-----------           ************')
+        moc, dedoc = get_oc(oc_unit, discipline)
+        print('MOC - DEDOC ', moc, dedoc)
+        doc = Document(name=document, moc_id=moc, dedoc_id=dedoc)
         session.add(doc)
         print('Document',doc.name)
 
-    rev = session.query(Revision).filter(Revision.name == revision, Document.name == document).first()
+    # session flush for doc id
+    # search the same rev for this document by doc id
+
+    rev = session.query(Revision).filter(Revision.name == revision, Revision.document_id == doc.id).first() 
+    print('searching for revision, document:', revision, document)
+    print('found', rev)
     if rev is None:
         print(rev)
         print('    ----------     Rev is None: ', revision, rev_stage, document)
         rev = Revision(name=revision, document=doc)
+        session.add(rev)
         
     rev.stage = rev_stage
-    session.add(rev)
-    print(rev.id)
-    print(doc.id)
+    
+    
     session.flush()
-    print(rev.id)
-    print(doc.id)
+    
 
     '''
         HEADER - UPDATE THE COMMENT SHEET
     '''
 
-    print('***********************')
-    print(csSheet['C9'].value)
-    
-    
-    print('before maybe here')
     item.revision_id = rev.id
     item.document_id = doc.id
-    
 
     item.ownerTransmittalReference = csSheet['C9'].value
-    print('*********************** BEFORE DATE PARSE')
     item.ownerTransmittalDate = date_parse(csSheet['D9'].value)
-    print('*********************** DATE PARSE')
     item.response_status = csSheet['C12'].value
 
     item.contractorTransmittalReference = csSheet['H8'].value
@@ -267,7 +290,11 @@ def get_data_from_cs(item):
     item.documentReferenceDoc = csSheet['K8'].value
     item.documentReferenceRev = csSheet['K9'].value
     item.documentReferenceDesc = csSheet['K10'].value
+    
+    # Discipline
     item.documentReferenceBy = csSheet['K11'].value
+
+    #item.documentReferenceBy = fdiscipline
     
     
     '''
@@ -277,7 +304,7 @@ def get_data_from_cs(item):
     if item.current:
         session.query(Comment).filter(Comment.document_id == doc.id).delete()
         
-        commentSheets = session.query(Commentsheet).filter(Revision.name == revision).all()
+        commentSheets = session.query(Commentsheet).filter(Commentsheet.document_id == doc.id).all()
         item.stage = rev_stage
 
         for cs in commentSheets:
@@ -285,7 +312,7 @@ def get_data_from_cs(item):
 
     try:
         for row in csSheet.iter_rows(min_row=17,min_col=2):
-            print('CommentStatus', row[0].value,row[9].value,row[10].value,row[11].value, type(row[11].value))
+            #print('CommentStatus', row[0].value,row[9].value,row[10].value,row[11].value, type(row[11].value))
             if row[0].value is not None:
                 #print(row[0].value) 
                 comment = Comment(
@@ -321,15 +348,336 @@ def get_data_from_cs(item):
                 session.add(comment)
         #session.query(Comment).filter(Comment.document_id == doc.id).delete()
 
-        #print('maybe here')
         session.commit()
-        #print('after commit')
-        #return True
+        return doc.id
+
     
     except:
         abort(400,'Error - Data in Table badly formatted :( - check your file !')
      
 
+
+
+
+def get_fake_data_from_cs(item):
+    #item ='4def885a-604b-11e9-bffd-ac87a32187da_sep_DRAS_2544-17-DW-0510-04_CY.xlsx'
+    session = db.session
+    
+    
+    csFile = openpyxl.load_workbook(UPLOAD_FOLDER+item.cs_file, data_only=True)
+    csSheet = csFile.active
+ 
+    print('--------       Query -|')
+    '''
+    # Check If a revision for this document already exist
+    DRAS_2544-17-DW-0510-04_CY.xlsx
+    '''
+    try:
+        document = item.cs_file.split('_sep_DRAS_')[1].split('_')[0]
+        full_revision = item.cs_file.split('_sep_DRAS_')[1].split('_')[1].split('.')[0]
+        revision = full_revision[:full_revision.index('Y')]
+        rev_stage = full_revision[full_revision.index('Y'):]
+
+        oc_unit = document.split('-')[1]
+        project = document.split('-')[0] 
+
+    except:
+        abort(400, 'Error in file name. Check Your File!')
+
+    doc = session.query(Document).filter(Document.name == document).first()
+    
+    if doc is None:
+        
+        discipline = csSheet['K11'].value
+        print('DOC is NONE *-----------           ************')
+        moc, dedoc = get_oc(oc_unit, discipline)
+        print('MOC - DEDOC ', moc, dedoc)
+        doc = Document(name=document, 
+                        moc_id=moc, 
+                        dedoc_id=dedoc,
+                        created_by_fk='1',
+                        changed_by_fk='1')
+        session.add(doc)
+        session.flush()
+        print('Document',doc.name)
+
+    # session flush for doc id
+    # search the same rev for this document by doc id
+
+    rev = session.query(Revision).filter(Revision.name == revision, Revision.document_id == doc.id).first() 
+    print('searching for revision, document:', revision,rev_stage, document)
+    print('found', rev)
+    if rev is None:
+        print(rev)
+        print('    ----------     Rev is None: ', revision, rev_stage, document)
+        rev = Revision(name=revision, document=doc,created_by_fk='1',
+                        changed_by_fk='1')
+        rev.stage = rev_stage
+        session.add(rev)
+        session.flush()
+        
+    
+    
+    
+    
+    
+
+    '''
+        HEADER - UPDATE THE COMMENT SHEET
+    '''
+
+    item.revision_id = rev.id
+    item.document_id = doc.id
+
+    item.ownerTransmittalReference = csSheet['C9'].value
+    item.ownerTransmittalDate = date_parse(csSheet['D9'].value)
+    item.response_status = csSheet['C12'].value
+
+    item.contractorTransmittalReference = csSheet['H8'].value
+    item.contractorTransmittalDate = date_parse(csSheet['H9'].value)
+    item.contractorTransmittalMr = csSheet['H10'].value
+    item.contractorTransmittalVendor = csSheet['H11'].value
+
+    item.documentReferenceDoc = csSheet['K8'].value
+    item.documentReferenceRev = csSheet['K9'].value
+    item.documentReferenceDesc = csSheet['K10'].value
+    item.documentReferenceBy = csSheet['K11'].value
+    
+    
+    '''
+    BODY - CREATE NEW COMMENTS FOR THIS CS
+    '''
+    
+    if item.current:
+        session.query(Comment).filter(Comment.document_id == doc.id).delete()
+        
+        commentSheets = session.query(Commentsheet).filter(Commentsheet.document_id == doc.id).all()
+        item.stage = rev_stage
+
+        for cs in commentSheets:
+            cs.current = False
+            cs.changed_by_fk = '1'
+
+    try:
+        for row in csSheet.iter_rows(min_row=17,min_col=2):
+            #print('CommentStatus', row[0].value,row[9].value,row[10].value,row[11].value, type(row[11].value))
+            if row[0].value is not None:
+                #print(row[0].value) 
+                comment = Comment(
+                    revision_id = rev.id,
+                    commentsheet = item,
+
+                    pos = row[0].value,
+                    tag = row[1].value,
+                    info = row[2].value,
+                    ownerCommentBy = row[3].value,
+                    ownerCommentDate = date_parse(csSheet['F15'].value),
+                    ownerCommentComment = row[4].value,
+
+                    contractorReplyDate = date_parse(csSheet['H15'].value),
+                    contractorReplyStatus = row[5].value,
+                    contractorReplyComment = row[6].value,
+                    
+                    ownerCounterReplyDate = date_parse(csSheet['J15'].value),
+                    ownerCounterReplyComment = row[7].value,
+
+                    finalAgreementDate = date_parse(csSheet['L15'].value),
+                    finalAgreemntCommentDate = date_parse(row[9].value),
+                    finalAgreementComment = row[10].value,
+
+                    commentStatus = str(row[11].value),
+                    
+                    created_by_fk='1',
+                    changed_by_fk='1'
+                )
+                if item.current:  
+                    
+                    comment.document_id = doc.id
+                    
+
+                #print('Contractor Status:',len(comment.contractorReplyStatus),comment.contractorReplyStatus)
+                session.add(comment)
+        #session.query(Comment).filter(Comment.document_id == doc.id).delete()
+
+        session.commit()
+        return doc.id
+
+    
+    except:
+        abort(400,'Error - Data in Table badly formatted :( - check your file !')
+     
+
+def get_fake_data_from_cs2(item):
+    #item ='4def885a-604b-11e9-bffd-ac87a32187da_sep_DRAS_2544-17-DW-0510-04_CY.xlsx'
+    session = db.session
+    
+    
+    csFile = openpyxl.load_workbook(UPLOAD_FOLDER+'fakeDras/DRAS_2544-13-MOM-4561-09_A0Y.xlsx', data_only=True)
+    csSheet = csFile.active 
+ 
+    #print('--------       Query -|')
+    '''
+    # Check If a revision for this document already exist
+    DRAS_2544-17-DW-0510-04_CY.xlsx
+    '''
+    try: 
+        document = item.cs_file.split('_sep_DRAS_')[1].split('_')[0]
+        full_revision = item.cs_file.split('_sep_DRAS_')[1].split('_')[1].split('.')[0]
+        revision = full_revision[:full_revision.index('Y')]
+        rev_stage = full_revision[full_revision.index('Y'):]
+
+        oc_unit = document.split('-')[1]
+        project = document.split('-')[0] 
+
+    except:
+        abort(400, 'Error in file name. Check Your File!')
+
+    doc = session.query(Document).filter(Document.name == document).first()
+    
+    if doc is None:
+        
+        discipline = csSheet['K11'].value
+        #print('DOC is NONE *-----------           ************')
+        moc, dedoc = get_oc(oc_unit, discipline)
+        #print('MOC - DEDOC ', moc, dedoc)
+        doc = Document(name=document, 
+                        moc_id=moc, 
+                        dedoc_id=dedoc,
+                        created_by_fk='1',
+                        changed_by_fk='1')
+        session.add(doc)
+        session.flush()
+        #print('Document',doc.name)
+
+    # session flush for doc id
+    # search the same rev for this document by doc id
+
+    rev = session.query(Revision).filter(Revision.name == revision, Revision.document_id == doc.id).first() 
+    print('searching for revision, document:', revision,rev_stage, document)
+    #print('found', rev)
+    #rev.stage = rev_stage
+    #rev.changed_by_fk = '1'
+    if rev:
+        rev.stage = rev_stage
+        rev.changed_by_fk = '1'
+    else:
+        #print(rev)
+        #print('    ----------     Rev is None: ', revision, rev_stage, document)
+        rev = Revision(name=revision, document=doc,
+                created_by_fk='1',
+                changed_by_fk='1',
+                stage=rev_stage)
+        
+        session.add(rev)
+        session.flush()
+    
+    #rev.stage = rev_stage
+    #rev.changed_by_fk = '1'
+    
+    
+    
+    
+    
+
+    '''
+        HEADER - UPDATE THE COMMENT SHEET
+    '''
+
+    item.revision_id = rev.id
+    item.document_id = doc.id
+
+    item.ownerTransmittalReference = csSheet['C9'].value
+    item.ownerTransmittalDate = date_parse(csSheet['D9'].value)
+    item.response_status = csSheet['C12'].value
+
+    item.contractorTransmittalReference = csSheet['H8'].value
+    item.contractorTransmittalDate = date_parse(csSheet['H9'].value)
+    item.contractorTransmittalMr = csSheet['H10'].value
+    item.contractorTransmittalVendor = csSheet['H11'].value
+
+    item.documentReferenceDoc = csSheet['K8'].value
+    item.documentReferenceRev = csSheet['K9'].value
+    item.documentReferenceDesc = csSheet['K10'].value
+    item.documentReferenceBy = csSheet['K11'].value
+    
+    
+    '''
+    BODY - CREATE NEW COMMENTS FOR THIS CS
+    '''
+    
+    if item.current:
+        session.query(Comment).filter(Comment.document_id == doc.id).delete()
+        
+        commentSheets = session.query(Commentsheet).filter(Commentsheet.document_id == doc.id).all()
+        item.stage = rev_stage
+
+        for cs in commentSheets:
+            cs.current = False
+            cs.changed_by_fk = '1'
+    
+    # random comment status
+    #
+    #   
+    
+    
+    def random_status():
+        status = ['Open', 'Closed']
+        return status[randint(0,1)]
+        
+    try:
+        for row in csSheet.iter_rows(min_row=17,min_col=2):
+            #print('CommentStatus', row[0].value,row[9].value,row[10].value,row[11].value, type(row[11].value))
+            if row[0].value is not None:
+                #print(row[0].value) 
+                comment = Comment(
+                    revision_id = rev.id,
+                    commentsheet = item,
+
+                    pos = row[0].value,
+                    tag = row[1].value,
+                    info = row[2].value,
+                    ownerCommentBy = row[3].value,
+                    ownerCommentDate = date_parse(csSheet['F15'].value),
+                    ownerCommentComment = row[4].value,
+
+                    contractorReplyDate = date_parse(csSheet['H15'].value),
+                    contractorReplyStatus = row[5].value,
+                    contractorReplyComment = row[6].value,
+                    
+                    ownerCounterReplyDate = date_parse(csSheet['J15'].value),
+                    ownerCounterReplyComment = row[7].value,
+
+                    finalAgreementDate = date_parse(csSheet['L15'].value),
+                    finalAgreemntCommentDate = date_parse(row[9].value),
+                    finalAgreementComment = row[10].value,
+
+                    #commentStatus = str(row[11].value),
+                    commentStatus = random_status(),
+
+                    created_by_fk='1',
+                    changed_by_fk='1'
+                )
+                if item.current:  
+                    
+                    comment.document_id = doc.id
+                    
+
+                #print('Contractor Status:',len(comment.contractorReplyStatus),comment.contractorReplyStatus)
+                session.add(comment)
+        #session.query(Comment).filter(Comment.document_id == doc.id).delete()
+
+        session.commit()
+        return doc.id
+
+    
+    except:
+        abort(400,'Error - Data in Table badly formatted :( - check your file !')
+     
+
+
+
+
+'''
 def find_rev():
     session = db.session
     document = '2544-17-DW-0510-04'
@@ -341,5 +689,5 @@ def find_rev():
     print('    ------  RR rev: ',rev.id, rev.name, rev.document)
     
     return
-
+'''
 #find_rev()

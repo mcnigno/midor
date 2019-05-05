@@ -1,0 +1,390 @@
+import openpyxl
+from app import db
+from app.comments.models import Moc, Unit, Dedoc, SplitOfWorks, Discipline, Commentsheet
+from app.comments.helpers import get_data_from_cs, get_fake_data_from_cs, get_fake_data_from_cs2
+from config import UPLOAD_FOLDER
+import uuid
+from flask_appbuilder.filemanager import FileManager
+from flask import current_app
+
+path = 'app/comments/ListeXLSX/OperatingCenter.xlsx'
+workbook = openpyxl.load_workbook(path)
+worksheet = workbook.active
+
+
+
+def add_discipline():
+    session = db.session
+    session.query(Discipline).delete()
+
+    disc_list = ['Process','Piping','Civil','Electrical','Instrument']
+
+    for dsc in disc_list:
+        new_dsc = Discipline(created_by_fk='1',
+                        changed_by_fk='1',
+                        name=dsc.upper())
+        session.add(new_dsc)
+    session.commit()    
+
+def add_moc():
+    session = db.session
+    session.query(Moc).delete()
+
+    main_op_set = set()
+    for row in worksheet.iter_rows(min_row=2):
+        main_op_set.add(row[1].value.strip())
+
+    print(main_op_set)
+    for moc in main_op_set:
+        m = Moc(name=moc, created_by_fk='1',changed_by_fk='1')
+        print(m)
+        session.add(m)
+    session.commit()
+    result = session.query(Moc)
+    return result   
+
+def add_oc():
+    session = db.session
+    session.query(Dedoc).delete()
+
+    oc_set = set()
+
+    for row in worksheet.iter_rows(min_row=2):
+        moc = row[1].value.strip()
+        dedoc = row[2].value.strip()
+
+        
+        process = row[8].value.strip()
+        piping = row[9].value.strip()
+        civil = row[10].value.strip()
+        electrical = row[11].value.strip()
+        instrument = row[12].value.strip()
+        
+        list_d = [dedoc,process,piping,civil,electrical, instrument]
+        print(moc, dedoc) 
+        for e in list_d:
+            #oc_set.add(e)
+        
+            xmoc = session.query(Moc).filter(Moc.name == moc).first()
+            print(e) 
+            if xmoc:
+                xdoc = session.query(Dedoc).filter(Dedoc.moc_id == xmoc.id, Dedoc.name == e).first() 
+                
+                if xdoc is None:
+                    new_dedoc = Dedoc(moc=xmoc, name=e, created_by_fk='1',changed_by_fk='1')
+                    session.add(new_dedoc)
+  
+        session.commit()
+
+def add_unit():
+    session = db.session
+    session.query(Unit).delete()
+
+    for row in worksheet.iter_rows(min_row=2):
+        code = row[0].value.split(" - ")[0] 
+        name = row[0].value.split(" - ")[1]
+        xmoc = row[1].value.strip()
+        xdedoc = row[2].value.strip() 
+
+        moc = session.query(Moc).filter(Moc.name == xmoc).first()
+        dedoc = session.query(Dedoc).filter(Dedoc.name == xdedoc).first()
+
+        
+        unit = Unit(code=code, 
+                    name=name,
+                    moc=moc,
+                    dedoc=dedoc, 
+                    created_by_fk='1', 
+                    changed_by_fk='1')
+        
+        session.add(unit)
+        #print(unit,name)
+    
+    session.commit()
+
+
+        # 
+     
+def splitOfWorks():
+    session = db.session
+    session.query(SplitOfWorks).delete()
+
+    for row in worksheet.iter_rows(min_row=2):
+        moc = row[1].value
+        dedoc = row[2].value
+        # Process,Piping,Civil,Electrical,Instrument
+        process = (row[8].value,'Process')
+        piping = (row[9].value, 'Piping')
+        civil = (row[10].value, 'Civil')
+        electrical = (row[11].value, 'Electrical')
+        instrument = (row[12].value, 'Instrument')
+        
+        funit = row[0].value.split(" - ")[0]
+        unit = session.query(Unit).filter(Unit.code == funit).first()
+        
+        list_d = [process,piping,civil,electrical, instrument]
+        
+        for e in list_d:
+            discipline = session.query(Discipline).filter(Discipline.name == e[1].upper()).first()
+            dedoc = session.query(Dedoc).filter(Dedoc.name == e[0]).first()
+            sow = SplitOfWorks(unit=unit,
+                                discipline=discipline,
+                                oc = dedoc,
+                                created_by_fk='1',
+                                changed_by_fk='1')
+            session.add(sow)
+    session.commit()
+
+def init_dras():
+    session = db.session
+    
+    session.query(SplitOfWorks).delete()
+    session.query(Discipline).delete()
+    session.query(Unit).delete()
+    session.query(Dedoc).delete()
+    session.query(Moc).delete()
+    
+    print('Initialization Start from:', path)
+    print('')
+    print('               -----  MOC Init...')
+    add_moc()
+
+    print('               -----  DED OC Init...')
+    add_oc()
+    
+    print('               -----  Discipline Init...')
+    add_discipline()
+
+    print('               -----  Unit Init...')
+    add_unit()
+
+    print('               -----  Split Of Works Init...')
+    splitOfWorks()
+    
+    print('                ok    Init is Done')
+ 
+#init_dras()
+#splitOfWorks()
+
+##
+##  Test
+##  
+from random import random, randint
+session = db.session
+fakeUnitList = session.query(Unit).all()
+
+def fakeDoc(revision,stage):
+    
+    
+    #unit = str(randint(1,60)).zfill(2)
+    unit = fakeUnitList[randint(1,len(fakeUnitList)-1)].code
+    doctype = ['DW','PID','MOM']
+    serial = str(randint(1,3)).zfill(4)
+    sheet = str(randint(1,3)).zfill(2)
+    #revision = ['A','A0','B','C']
+    #stage = ['Y','Y1','Y2','YF']
+    revision = revision
+    stage = stage
+    doc = "-".join(('DRAS_2544',
+                unit,
+                doctype[randint(0,len(doctype)-1)],
+                serial,
+                sheet + "_" + revision + stage+ ".xlsx"))
+         
+    return doc
+
+#fakeDoc(90000)
+# 
+#  
+import random
+from datetime import datetime, timedelta
+
+#done
+
+# or a function
+def gen_datetime(min_year=2017, max_year=datetime.now().year):
+    # generate a datetime in format yyyy-mm-dd hh:mm:ss.000000
+    start = datetime(min_year, 1, 1, 00, 00, 00)
+    years = max_year - min_year + 1
+    end = start + timedelta(days=365 * years)
+    return start + (end - start) * random.random()
+
+#print(randomDate("1/1/2017 1:30 PM", "1/1/2019 4:50 AM", random.random()))
+
+import glob, os
+from shutil import copyfile
+from datetime import datetime
+from app import app
+
+def fakeItem(times):
+    session = db.session
+    list_revision = ['A','A0','B','C']
+    list_stage = ['Y','Y1','Y2','YF']
+    for n in range(times):
+        for revision in list_revision:
+            for stage in list_stage:
+                
+                os.chdir(UPLOAD_FOLDER + "/fakeDras")
+                for file in glob.glob("*.xlsx"):
+                    
+                    fakedoc = fakeDoc(revision,stage)
+                    print('Fake DOC:', fakedoc) 
+                    csid = str(uuid.uuid4())
+                    fakename =UPLOAD_FOLDER+ "/fakeDrasOUT/" + csid +"_sep_" + fakedoc
+                    fakefile = "fakeDrasOUT/" + csid +"_sep_" + fakedoc 
+                    
+                    copyfile(file, fakename)
+                    '''
+                    documentClientCode = Column(String(50))
+
+                    issuetype_id = Column(Integer, ForeignKey('issuetype.id'))
+                    issuetype = relationship(Issuetype)
+
+                    actionrequired_id = Column(Integer, ForeignKey('actionrequired.id'))
+                    actionrequired = relationship(Actionrequired)
+
+                    notificationItem = Column(String(50))
+                    actualDate = Column(Date)
+                    expectedDate = Column(Date)
+                    plannedDate = Column(Date)
+                    '''
+                    cs = Commentsheet(cs_file=fakefile,
+                            current=True,
+                            created_by_fk='1',
+                            changed_by_fk='1',
+
+                            documentClientCode = 'Any Document Client Code',
+                            issuetype_id= '1',
+                            actionrequired_id='1',
+                            notificationItem='Email/Transmittal Id',
+
+                            actualDate=gen_datetime(),
+                            expectedDate=gen_datetime(),
+                            plannedDate=gen_datetime(),)
+                    try:
+                        data = get_fake_data_from_cs(cs) 
+                        session.add(cs)  
+                    except:
+                        pass
+    session.commit()
+
+def fakeItem2(serials):
+    session = db.session
+    units = session.query(Unit).all()
+    doctypes = ['MOM','PID','MR','SOW']
+    revisions = ['A','B','C']
+    stages = ['Y','Y1','Y2','YF']
+    sheet = '01'
+    
+    for unit in units:
+        for doctype in doctypes:
+            for revision in revisions:
+                for stage in stages:
+                    for serial in serials:
+                        doc = "-".join(('DRAS_2544',
+                                        unit.code,
+                                        doctype,
+                                        serial,
+                                        sheet + "_" + revision + stage+ ".xlsx"))
+            
+                        os.chdir(UPLOAD_FOLDER + "/fakeDras")
+                        for file in glob.glob("*.xlsx"):
+                            
+                            fakedoc = doc
+                            print('Fake DOC:', fakedoc) 
+                            csid = str(uuid.uuid4())
+                            fakename =UPLOAD_FOLDER+ "/fakeDrasOUT/" + csid +"_sep_" + fakedoc
+                            fakefile = "fakeDrasOUT/" + csid +"_sep_" + fakedoc 
+                            
+                            copyfile(file, fakename)
+                           
+                            cs = Commentsheet(cs_file=fakefile,
+                                    current=True,
+                                    created_by_fk='1',
+                                    changed_by_fk='1',
+
+                                    documentClientCode = 'Any Document Client Code',
+                                    issuetype_id= '1',
+                                    actionrequired_id='1',
+                                    notificationItem='Email/Transmittal Id',
+
+                                    actualDate=gen_datetime(),
+                                    expectedDate=gen_datetime(),
+                                    plannedDate=gen_datetime(),)
+                            try:
+                                data = get_fake_data_from_cs(cs) 
+                                session.add(cs)  
+                            except:
+                                pass
+    
+
+    session.commit()
+
+
+from tempfile import NamedTemporaryFile
+
+def fakeItem3(times):
+    session = db.session
+    units = session.query(Unit).all()
+    doctypes = ['MOM','PID','MR','SOW']
+    revisions = ['A','B','C']
+    stages = ['Y','Y1','Y2','YF']
+    sheet = '01'
+    
+
+    def random_element(lista):
+        return lista[randint(0,len(lista)-1)]
+    
+    for n in range(times):
+        print('                --------------------------------|',n)
+        c_unit = random_element(units)
+        c_doctype = random_element(doctypes)
+        serials = randint(0,9999)
+        
+        c_serial= str(serials).zfill(4)
+        
+        for revision in revisions:
+            for stage in stages:
+                doc = "-".join(('DRAS_2544',
+                                        c_unit.code,
+                                        c_doctype,
+                                        c_serial,
+                                        sheet + "_" + revision + stage+ ".xlsx"))
+            
+                #os.chdir(UPLOAD_FOLDER + "/fakeDras")
+                
+                f = NamedTemporaryFile()
+                f.file = UPLOAD_FOLDER + "/fakeDras/DRAS_2544-13-MOM-4561-09_A0Y.xlsx"
+                
+                csid = str(uuid.uuid4())
+                f.name = csid +"_sep_" + doc
+                
+                fakefile = f
+                
+                cs = Commentsheet(cs_file=fakefile.name,
+                        current=True,
+                        created_by_fk='1',
+                        changed_by_fk='1',
+
+                        documentClientCode = 'Any Document Client Code',
+                        issuetype_id= '1',
+                        actionrequired_id='1',
+                        notificationItem='Email/Transmittal Id',
+
+                        actualDate=gen_datetime(),
+                        expectedDate=gen_datetime(),
+                        plannedDate=gen_datetime(),)
+                    
+                data = get_fake_data_from_cs2(cs) 
+                session.add(cs)
+                f.close()    
+                       
+    session.commit()
+    
+
+#fakeItem(1)                  
+#fakeItem2(['0020','0054','0124','0155','0034'])
+#fakeItem2(['0020','0054'])
+#fakeItem3(100)
+ 
+     

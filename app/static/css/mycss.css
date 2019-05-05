@@ -231,10 +231,28 @@ i.fa.fa-file-word-o {
     text-align: center;
 }
 
+
+
 .Final{
     background-color: #738b9473 !important;
-    
-    
+}
+.Commented{
+    background-color: rgb(106, 130, 124) !important; 
+}
+.Replied{
+    background-color: rgb(133, 155, 173) !important;
+}
+
+
+
+.Current{
+    padding: 4px;
+    width: 68px;
+    background-color: #d3272e;
+    font-size: 8pt;
+    text-transform: uppercase;
+    text-align: center;
+    color: whitesmoke;
 }
 .RevCardTitle {
     background-color: rgb(41, 110, 167);
@@ -256,4 +274,17 @@ i.fa.fa-file-word-o {
 }
 .final-comment-footer{
     height: 20px;
+}
+
+i.fa.fa-arrow-circle-left{
+    margin-right: 10px;
+    color: rgb(196, 160, 1) !important; 
+}
+i.fa.fa-arrow-circle-right{
+    margin-right: 10px;
+    color: rgb(105, 22, 47) !important; 
+}
+i.fa.fa-check-circle{
+    margin-right: 10px;
+    color: rgb(22, 105, 47) !important; 
 }

@@ -29,7 +29,7 @@
             {% endif %}
         
         </div>
-        <h4 class="RevCardTitle {{item['stage_class']}}">Revision {{item['name'] }} | {{ item['stage_class'] }}</h4>
+        <h4 class="RevCardTitle {{item['stage_class']}} ">Revision {{item['name'] }} | {{ item['stage_class'] }}</h4>
         {% for value in include_columns %}
             {% if loop.index == 1 %}
                 <h4 class="list-group-item-heading">{{ item[value] }}</h4>
