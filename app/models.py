@@ -246,9 +246,9 @@ class Drasrevision(Model, AuditMixin):
 
     def current_cs(self):
         try:
-            current_cs = db.session.query(Commentsheet).filter(
-                Commentsheet.revision_id == self.id,
-                Commentsheet.current == True).first()
+            current_cs = db.session.query(Drascommentsheet).filter(
+                Drascommentsheet.drasrevision_id == self.id,
+                Drascommentsheet.current == True).first()
             if current_cs is None:
                 return Markup('<small class="Superseeded">Superseeded</small>')
             return Markup('<small class="Current">current</small>') + current_cs.download() 

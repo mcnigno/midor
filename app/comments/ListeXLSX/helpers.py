@@ -1,27 +1,55 @@
-'''
+
 import openpyxl
 from app import db
-from app.models import Moc, Unit, Dedoc, SplitOfWorks, Discipline, Commentsheet
+from app.models import (Mocmodel, Unitmodel, Dedocmodel,
+                Splitofworks, Disciplinedras, Drascommentsheet,
+                Drasissuetype, Drasactionrequired)
 from app.comments.helpers import get_data_from_cs, get_fake_data_from_cs, get_fake_data_from_cs2
 from config import UPLOAD_FOLDER
 import uuid
 from flask_appbuilder.filemanager import FileManager
 from flask import current_app
+import random
 
 path = 'app/comments/ListeXLSX/OperatingCenter.xlsx'
 workbook = openpyxl.load_workbook(path)
 worksheet = workbook.active
 
+def add_actionRequired():
+    session = db.session
+    session.query(Drasactionrequired).delete()
 
+    ac_list = ['Action Required Type 1','Action Required Type 2','Action Required Type 3','Action Required Type 4','Action Required Type 5']
+    
+    for ac in ac_list:
+        new_ac = Drasactionrequired(created_by_fk='1',
+                        changed_by_fk='1',
+                        name=random.choice(ac_list))
+        session.add(new_ac)
+    session.commit()
+
+def add_issueType():
+    session = db.session
+    session.query(Drasissuetype).delete()
+
+    issue_list = ['Issue Type 1','Issue Type 2','Issue Type 3','Issue Type 4','Issue Type 5']
+    
+    for issue in issue_list:
+        print('random choice', random.choice(issue_list))
+        new_issue = Drasissuetype(created_by_fk='1',
+                        changed_by_fk='1',
+                        name=random.choice(issue_list))
+        session.add(new_issue)
+    session.commit()
 
 def add_discipline():
     session = db.session
-    session.query(Discipline).delete()
+    session.query(Disciplinedras).delete()
 
     disc_list = ['Process','Piping','Civil','Electrical','Instrument']
 
     for dsc in disc_list:
-        new_dsc = Discipline(created_by_fk='1',
+        new_dsc = Disciplinedras(created_by_fk='1',
                         changed_by_fk='1',
                         name=dsc.upper())
         session.add(new_dsc)
@@ -29,7 +57,7 @@ def add_discipline():
 
 def add_moc():
     session = db.session
-    session.query(Moc).delete()
+    session.query(Mocmodel).delete()
 
     main_op_set = set()
     for row in worksheet.iter_rows(min_row=2):
@@ -37,16 +65,16 @@ def add_moc():
 
     print(main_op_set)
     for moc in main_op_set:
-        m = Moc(name=moc, created_by_fk='1',changed_by_fk='1')
+        m = Mocmodel(name=moc, created_by_fk='1',changed_by_fk='1')
         print(m)
         session.add(m)
     session.commit()
-    result = session.query(Moc)
-    return result   
+    #result = session.query(Mocmodel)
+    #return result   
 
 def add_oc():
     session = db.session
-    session.query(Dedoc).delete()
+    session.query(Dedocmodel).delete()
 
     oc_set = set()
 
@@ -66,20 +94,20 @@ def add_oc():
         for e in list_d:
             #oc_set.add(e)
         
-            xmoc = session.query(Moc).filter(Moc.name == moc).first()
+            xmoc = session.query(Mocmodel).filter(Mocmodel.name == moc).first()
             print(e) 
             if xmoc:
-                xdoc = session.query(Dedoc).filter(Dedoc.moc_id == xmoc.id, Dedoc.name == e).first() 
+                xdoc = session.query(Dedocmodel).filter(Dedocmodel.moc_id == xmoc.id, Dedocmodel.name == e).first() 
                 
                 if xdoc is None:
-                    new_dedoc = Dedoc(moc=xmoc, name=e, created_by_fk='1',changed_by_fk='1')
+                    new_dedoc = Dedocmodel(moc=xmoc, name=e, created_by_fk='1',changed_by_fk='1')
                     session.add(new_dedoc)
   
         session.commit()
 
 def add_unit():
     session = db.session
-    session.query(Unit).delete()
+    session.query(Unitmodel).delete()
 
     for row in worksheet.iter_rows(min_row=2):
         code = row[0].value.split(" - ")[0] 
@@ -87,11 +115,11 @@ def add_unit():
         xmoc = row[1].value.strip()
         xdedoc = row[2].value.strip() 
 
-        moc = session.query(Moc).filter(Moc.name == xmoc).first()
-        dedoc = session.query(Dedoc).filter(Dedoc.name == xdedoc).first()
+        moc = session.query(Mocmodel).filter(Mocmodel.name == xmoc).first()
+        dedoc = session.query(Dedocmodel).filter(Dedocmodel.name == xdedoc).first()
 
         
-        unit = Unit(code=code, 
+        unit = Unitmodel(code=code, 
                     name=name,
                     moc=moc,
                     dedoc=dedoc, 
@@ -108,7 +136,7 @@ def add_unit():
      
 def splitOfWorks():
     session = db.session
-    session.query(SplitOfWorks).delete()
+    session.query(Splitofworks).delete()
 
     for row in worksheet.iter_rows(min_row=2):
         moc = row[1].value
@@ -121,15 +149,15 @@ def splitOfWorks():
         instrument = (row[12].value, 'Instrument')
         
         funit = row[0].value.split(" - ")[0]
-        unit = session.query(Unit).filter(Unit.code == funit).first()
+        unit = session.query(Unitmodel).filter(Unitmodel.code == funit).first()
         
         list_d = [process,piping,civil,electrical, instrument]
         
         for e in list_d:
-            discipline = session.query(Discipline).filter(Discipline.name == e[1].upper()).first()
-            dedoc = session.query(Dedoc).filter(Dedoc.name == e[0]).first()
-            sow = SplitOfWorks(unit=unit,
-                                discipline=discipline,
+            discipline = session.query(Disciplinedras).filter(Disciplinedras.name == e[1].upper()).first()
+            dedoc = session.query(Dedocmodel).filter(Dedocmodel.name == e[0]).first()
+            sow = Splitofworks(unitmodel=unit,
+                                disciplinedras=discipline,
                                 oc = dedoc,
                                 created_by_fk='1',
                                 changed_by_fk='1')
@@ -139,16 +167,28 @@ def splitOfWorks():
 def init_dras():
     session = db.session
     
-    session.query(SplitOfWorks).delete()
-    session.query(Discipline).delete()
-    session.query(Unit).delete()
-    session.query(Dedoc).delete()
-    session.query(Moc).delete()
+    session.query(Drasactionrequired).delete()
+    session.query(Drasissuetype).delete()
+
+    session.query(Splitofworks).delete()
+    session.query(Disciplinedras).delete()
+    session.query(Unitmodel).delete()
+    session.query(Dedocmodel).delete()
+    session.query(Mocmodel).delete()
     
     print('Initialization Start from:', path)
     print('')
+    
+    print('               -----  Action Required Init...')
+    add_actionRequired()
+    
+    print('               -----  Issu Type Init...')
+    add_issueType()
+
+
     print('               -----  MOC Init...')
     add_moc()
+
 
     print('               -----  DED OC Init...')
     add_oc()
@@ -163,16 +203,16 @@ def init_dras():
     splitOfWorks()
     
     print('                ok    Init is Done')
- 
+  
 #init_dras()
-#splitOfWorks()
+
 
 ##
 ##  Test
 ##  
 from random import random, randint
 session = db.session
-fakeUnitList = session.query(Unit).all()
+fakeUnitList = session.query(Unitmodel).all()
 
 def fakeDoc(revision,stage):
     
@@ -236,7 +276,7 @@ def fakeItem(times):
                     
                     copyfile(file, fakename)
                     
-                    cs = Commentsheet(cs_file=fakefile,
+                    cs = Drascommentsheet(cs_file=fakefile,
                             current=True,
                             created_by_fk='1',
                             changed_by_fk='1',
@@ -313,7 +353,7 @@ from tempfile import NamedTemporaryFile
 
 def fakeItem3(times):
     session = db.session
-    units = session.query(Unit).all()
+    units = session.query(Unitmodel).all()
     doctypes = ['MOM','PID','MR','SOW']
     revisions = ['A','B','C']
     stages = ['Y','Y1','Y2','YF']
@@ -348,15 +388,17 @@ def fakeItem3(times):
                 f.name = csid +"_sep_" + doc
                 
                 fakefile = f
-                
-                cs = Commentsheet(cs_file=fakefile.name,
+                it_list = session.query(Drasissuetype).all()
+                ac_list = session.query(Drasactionrequired).all()
+
+                cs = Drascommentsheet(cs_file=fakefile.name,
                         current=True,
                         created_by_fk='1',
                         changed_by_fk='1',
 
                         documentClientCode = 'Any Document Client Code',
-                        issuetype_id= '1',
-                        actionrequired_id='1',
+                        issuetype_id= random.choice(it_list).id,
+                        actionrequired_id=random.choice(ac_list).id,
                         notificationItem='Email/Transmittal Id',
 
                         actualDate=gen_datetime(),
@@ -373,6 +415,6 @@ def fakeItem3(times):
 #fakeItem(1)                  
 #fakeItem2(['0020','0054','0124','0155','0034'])
 #fakeItem2(['0020','0054'])
-#fakeItem3(100)
+#fakeItem3(99)
  
-'''     
+     

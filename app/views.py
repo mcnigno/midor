@@ -32,6 +32,7 @@ from app.comments.helpers import update_data_from_cs
 from flask_babel import lazy_gettext
 
 
+from app.comments.ListeXLSX.helpers import fakeItem3
 
 '''
 from app.comments.views import (DocumentView, RevisionView, CommentSheetView, 
@@ -129,36 +130,9 @@ class SowView(ModelView):
         return redirect(self.get_redirect())
 
 
-class DrasdocumentView(ModelView):
-    datamodel = SQLAInterface(Drasdocument)
-    #related_views = [CommentSheetView, RevisionView, CommentView]
-    show_template = 'appbuilder/general/model/show_cascade.html'
 
-    list_columns = ['name','created_on','created_by']
-    show_columns = ['name','moc','dedoc']
 
-    label_columns = {
-        
-        'moc':'Main Operating Center',
-        'dedoc':'DED Operating Center'
-    }
 
-class RevisionView(ModelView):
-    datamodel = SQLAInterface(Drasrevision)
-    list_columns = ['document','stage_class','name', 'current_cs'] 
-    #related_views = [CommentSheetView, CommentView] 
-    #default_view = 'show'
-    list_widget = RevisionListCard
-    show_template = 'appbuilder/general/model/show_cascade.html'
-
-    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
-    def muldelete(self, items):
-        if isinstance(items, list):
-            self.datamodel.delete_all(items)
-            self.update_redirect()
-        else:
-            self.datamodel.delete(items)
-        return redirect(self.get_redirect())
 
 class IssueTypeView(ModelView):
     datamodel = SQLAInterface(Drasissuetype)
@@ -175,32 +149,34 @@ class CommentSheetView(ModelView):
     add_columns = ['cs_file', 'current'] 
     list_columns = ['created_on','stage_icon','documentReferenceRev','filename', 'is_current', 'download'] 
     label_columns = {
-        'documentReferenceDoc': 'Document',
-        'documentReferenceRev': 'Revision', 
-        'documentReferenceDesc': 'Description',
-        'documentReferenceBy': 'By',
+        'documentReferenceDoc':     'Document',
+        'documentReferenceRev':     'Revision', 
+        'documentReferenceDesc':    'Description',
+        'documentReferenceBy':      'By',
 
-        'ownerTransmittalReference': 'ID', 
-        'ownerTransmittalDate':'Date', 
-        'response_status': 'Status',
+        'ownerTransmittalReference':'ID', 
+        'ownerTransmittalDate':     'Date', 
+        'response_status':          'Status',
 
-        'contractorTransmittalReference': 'ID', 
-        'contractorTransmittalDate': 'Date', 
-        'contractorTransmittalMr': 'MR',
-        'contractorTransmittalVendor':'Vendor',
+        'contractorTransmittalReference':   'ID', 
+        'contractorTransmittalDate':        'Date', 
+        'contractorTransmittalMr':          'MR',
+        'contractorTransmittalVendor':      'Vendor',
         'stage_icon':'Stage',
 
-        'issuetype':'Issue Type', 
-        'actionrequired':'Action Required', 
-        'notificationItem':'Notification Item',
-        'actualDate': 'Actual Date', 
-        'expectedDate': 'Expected Date',
-        'plannedDate': 'Planned Date'
+        'issuetype':                'Issue Type', 
+        'actionrequired':           'Action Required', 
+        'notificationItem':         'Notification Item',
+        'actualDate':               'Actual Date', 
+        'expectedDate':             'Expected Date',
+        'plannedDate':              'Planned Date',
+        'drasdocument':             'Document',
+        'drasrevision':             'Revision'
     }
     show_fieldsets = [
         (lazy_gettext('DRAS Info'),
 
-         {'fields': ['id', 'document', 'revision', 'stage_icon']}),
+         {'fields': ['id', 'drasdocument', 'drasrevision', 'stage_icon']}),
         
         (lazy_gettext('Document Reference'),
 
@@ -275,7 +251,7 @@ class CommentSheetView(ModelView):
         update_data_from_cs(item) 
  
         #return redirect(self.get_redirect())
-        return redirect(url_for('DocumentView.show', pk=item.drasdocument_id))
+        return redirect(url_for('DrasdocumentView.show', pk=item.drasdocument_id))
 
     def pre_add(self, item):
         
@@ -305,7 +281,7 @@ class CommentSheetView(ModelView):
         doc = str(session['last_document'])
         print('POST EDIT FUNCTION ************ ',session['last_document'] )
 
-        return redirect(url_for('DocumentView.show', pk=doc))
+        return redirect(url_for('DrasdocumentView.show', pk=doc))
 
 class CommentView(ModelView):
     datamodel = SQLAInterface(Drascomment)
@@ -328,7 +304,36 @@ class CommentView(ModelView):
             self.datamodel.delete(items)
         return redirect(self.get_redirect())
 
+class RevisionView(ModelView):
+    datamodel = SQLAInterface(Drasrevision)
+    list_columns = ['document','stage_class','name', 'current_cs'] 
+    related_views = [CommentSheetView, CommentView] 
+    #default_view = 'show'
+    list_widget = RevisionListCard
+    show_template = 'appbuilder/general/model/show_cascade.html'
 
+    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
+    def muldelete(self, items):
+        if isinstance(items, list):
+            self.datamodel.delete_all(items)
+            self.update_redirect()
+        else:
+            self.datamodel.delete(items)
+        return redirect(self.get_redirect())
+
+class DrasdocumentView(ModelView):
+    datamodel = SQLAInterface(Drasdocument)
+    related_views = [CommentSheetView, RevisionView, CommentView]
+    show_template = 'appbuilder/general/model/show_cascade.html'
+
+    list_columns = ['name','created_on','created_by']
+    show_columns = ['name','moc','dedoc']
+
+    label_columns = {
+        
+        'moc':'Main Operating Center',
+        'dedoc':'DED Operating Center'
+    }
 
 class DrasUploadView(ModelView):
     datamodel = SQLAInterface(Drascommentsheet)
@@ -409,7 +414,7 @@ class DrasUploadView(ModelView):
         doc = str(session['last_document'])
         print('POST EDIT FUNCTION ************ ',session['last_document'] )
 
-        return redirect(url_for('DocumentView.show', pk=doc))
+        return redirect(url_for('DrasdocumentView.show', pk=doc))
 
 
 '''
@@ -527,3 +532,4 @@ db.create_all()
 #upload_ewd()
 #create_file_list()
 #upload_correspondence()
+#fakeItem3(1)  

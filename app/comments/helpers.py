@@ -255,8 +255,8 @@ def get_data_from_cs(item):
 
     # session flush for doc id
     # search the same rev for this document by doc id
-
-    rev = session.query(Drasrevision).filter(Drasrevision.name == revision, Drasrevision.document_id == doc.id).first() 
+    print('BLOCKED HERE ------------------ //////////////////////')
+    rev = session.query(Drasrevision).filter(Drasrevision.name == revision, Drasrevision.drasdocument_id == doc.id).first() 
     print('searching for revision, document:', revision, document)
     print('found', rev)
     if rev is None:
@@ -275,8 +275,8 @@ def get_data_from_cs(item):
         HEADER - UPDATE THE COMMENT SHEET
     '''
 
-    item.revision_id = rev.id
-    item.document_id = doc.id
+    item.drasrevision_id = rev.id
+    item.drasdocument_id = doc.id
 
     item.ownerTransmittalReference = csSheet['C9'].value
     item.ownerTransmittalDate = date_parse(csSheet['D9'].value)
