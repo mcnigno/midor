@@ -12,6 +12,7 @@ AuditMixin will add automatic timestamp of created and modified by who
 
 Progressive
 """
+from app.comments.models import *
 
 class EarlyWorksDoc(Model):
     id = Column(Integer, primary_key=True)
