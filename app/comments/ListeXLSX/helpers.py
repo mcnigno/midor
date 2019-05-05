@@ -361,7 +361,7 @@ def fakeItem3(times):
     units = session.query(Unitmodel).all()
     doctypes = ['MOM','PID','MR','SOW']
     revisions = ['A','B']
-    stages = ['Y','Y1']
+    stages = ['Y']
     sheet = '01'
     
 
