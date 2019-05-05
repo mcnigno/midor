@@ -11,11 +11,34 @@ from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFu
 """
     DRASS Comments View Section
 """
+from flask_appbuilder.baseviews import BaseView, expose
+from flask_appbuilder import ModelView, action, MasterDetailView, MultipleView
+from flask_appbuilder.models.sqla.interface import SQLAInterface
+#from flask import render_template, request
+#from app.models import Document, Revision, Commentsheet, Comment, Dedoc, Moc,Discipline, Unit, SplitOfWorks, Actionrequired, Issuetype
+from app.models import (Disciplinedras, Mocmodel, Dedocmodel, Unitmodel, 
+                        Splitofworks, Drasdocument, Drasrevision, Drasissuetype,
+                        Drasactionrequired, Drascommentsheet, Drascomment)
+
+
+from app import appbuilder, db
+from app.comments.helpers import check_labels, get_data_from_cs
+from flask import session, redirect, url_for, abort
+from app.comments.customWidgets import commentListWidget, RevisionListCard
+from flask_appbuilder.widgets import ListBlock
+from app.comments.helpers import update_data_from_cs
+#from app.comments.ListeXLSX.helpers import add_moc, add_unit
+#import app.comments.ListeXLSX.helpers
+from flask_babel import lazy_gettext
+
+
+
+'''
 from app.comments.views import (DocumentView, RevisionView, CommentSheetView, 
                                 CommentView, DrasUploadView, DEDOperatingCenterView,
                                 MainOperatingCenterView, DEDOperatingCenterView, UnitView,
                                 SowView, IssueTypeView, ActionRequiredView)
-
+'''
 
 """
     Early Works View Section 
@@ -29,6 +52,8 @@ class MidorewdDashboardView(BaseView):
 class EarlyWorksDocView(ModelView):
     datamodel = SQLAInterface(EarlyWorksDoc)
     list_columns = ['discipline', 'contractor_code', 'revision', 'short_desc','file']
+    #list_columns = ['contractor_code', 'short_desc','file']
+    #
     #show_template = 'custom/showdoc.html'
     list_template = 'listEwd.html'              
 
@@ -56,63 +81,44 @@ class Uop_SpecView(ModelView):
     list_columns = ['document_code', 'revision', 'doc_description', 'file']
     list_template = 'listUop_spec.html' 
 
-"""    
-    Application wide 404 error handler
-"""
-@appbuilder.app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html', base_template=appbuilder.base_template, appbuilder=appbuilder), 404
+
+class DisciplineView(ModelView):
+    datamodel = SQLAInterface(Disciplinedras)
+    #related_views = [CommentSheetView, RevisionView, CommentView]
+    #show_template = 'appbuilder/general/model/show_cascade.html'
+
+    list_columns = ['name','created_on','created_by']
+
+class DEDOperatingCenterView(ModelView):
+    datamodel = SQLAInterface(Dedocmodel)
+    #related_views = [CommentSheetView, RevisionView, CommentView]
+    #show_template = 'appbuilder/general/model/show_cascade.html'
+
+    list_columns = ['name','moc','created_on','created_by']
+
+class MainOperatingCenterView(ModelView):
+    datamodel = SQLAInterface(Mocmodel)
+    #related_views = [DEDOperatingCenterView]
+    show_template = 'appbuilder/general/model/show_cascade.html'
+
+    list_columns = ['name','created_on','created_by']
 
 
+class UnitView(ModelView):
+    datamodel = SQLAInterface(Unitmodel)
+    #related_views = [CommentSheetView, RevisionView, CommentView]
+    #show_template = 'appbuilder/general/model/show_cascade.html'
 
-appbuilder.add_view(MidorewdDashboardView, "Early Works Documentation", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
-appbuilder.add_view(EarlyWorksDocView, "Engineering Documents", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
-appbuilder.add_view(EarlyWorksDocViewRestricted, "Engineering Documents PMC", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
-appbuilder.add_view(CorrespondenceView, "Correspondence", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
-appbuilder.add_view(Uop_BpdView, "UOP BDP List", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
-appbuilder.add_view(Uop_SpecView, "UOP Std. Specification", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
-
+    list_columns = ['name','code','moc', 'dedoc', 'created_on','created_by']
 
 
-#appbuilder.add_view(RevisionView,'Revision',icon="fa-folder-open-o", category="DRAS", category_icon='fa-envelope')
+class SowView(ModelView):
+    datamodel = SQLAInterface(Splitofworks)
+    #related_views = [CommentSheetView, RevisionView, CommentView]
+    #show_template = 'appbuilder/general/model/show_cascade.html'
 
-###
-##
-##    DRAS
-##  
-## 
+    #list_columns = ['id','unit.name','unit.code','discipline.name', 'oc','oc.moc']
 
-'''
-
-
-from flask_appbuilder.baseviews import BaseView, expose
-from flask_appbuilder import ModelView, action, MasterDetailView, MultipleView
-from flask_appbuilder.models.sqla.interface import SQLAInterface
-#from flask import render_template, request
-from app.comments.models import Document, Revision, Commentsheet, Comment, Dedoc, Moc, Discipline, Unit, SplitOfWorks, Actionrequired, Issuetype
-from app import appbuilder, db
-from .helpers import check_labels, get_data_from_cs
-from flask import session, redirect, url_for, abort
-from app.comments.customWidgets import commentListWidget, RevisionListCard
-from flask_appbuilder.widgets import ListBlock
-from .helpers import update_data_from_cs
-from app.comments.ListeXLSX.helpers import add_moc, add_unit
-#import app.comments.ListeXLSX.helpers
-from flask_babel import lazy_gettext
-   
-   
-class CommentView(ModelView):
-    datamodel = SQLAInterface(Comment)
-    list_columns = ['ownerCommentComment','contractorReplyComment','ownerCounterReplyComment','finalComment', 'commentStatus', 'pos']
-    
-    list_widget = commentListWidget
-    label_columns = {
-        'ownerCommentBy': 'Owner',
-        'ownerCommentComment': 'Owner Comment',
-        'contractorReplyComment': 'Contractor Reply',
-        'ownerCounterReplyComment' : 'Owner Reply'
-    }
-   
     @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
     def muldelete(self, items):
         if isinstance(items, list):
@@ -123,8 +129,45 @@ class CommentView(ModelView):
         return redirect(self.get_redirect())
 
 
+class DrasdocumentView(ModelView):
+    datamodel = SQLAInterface(Drasdocument)
+    #related_views = [CommentSheetView, RevisionView, CommentView]
+    show_template = 'appbuilder/general/model/show_cascade.html'
+
+    list_columns = ['name','created_on','created_by']
+    show_columns = ['name','moc','dedoc']
+
+    label_columns = {
+        
+        'moc':'Main Operating Center',
+        'dedoc':'DED Operating Center'
+    }
+
+class RevisionView(ModelView):
+    datamodel = SQLAInterface(Drasrevision)
+    list_columns = ['document','stage_class','name', 'current_cs'] 
+    #related_views = [CommentSheetView, CommentView] 
+    #default_view = 'show'
+    list_widget = RevisionListCard
+    show_template = 'appbuilder/general/model/show_cascade.html'
+
+    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
+    def muldelete(self, items):
+        if isinstance(items, list):
+            self.datamodel.delete_all(items)
+            self.update_redirect()
+        else:
+            self.datamodel.delete(items)
+        return redirect(self.get_redirect())
+
+class IssueTypeView(ModelView):
+    datamodel = SQLAInterface(Drasissuetype)
+
+class ActionRequiredView(ModelView):
+    datamodel = SQLAInterface(Drasactionrequired)
+
 class CommentSheetView(ModelView):
-    datamodel = SQLAInterface(Commentsheet)
+    datamodel = SQLAInterface(Drascommentsheet)
     add_title = 'DRAS View'
     edit_title = 'DRAS Edit'
     list_title = 'DRAS List'
@@ -232,7 +275,7 @@ class CommentSheetView(ModelView):
         update_data_from_cs(item) 
  
         #return redirect(self.get_redirect())
-        return redirect(url_for('DocumentView.show', pk=item.document_id))
+        return redirect(url_for('DocumentView.show', pk=item.drasdocument_id))
 
     def pre_add(self, item):
         
@@ -250,7 +293,7 @@ class CommentSheetView(ModelView):
 
 
     def pre_update(self, item):
-        session['last_document'] = item.document_id
+        session['last_document'] = item.drasdocument_id
         
         
         # Find or Create Document
@@ -264,8 +307,31 @@ class CommentSheetView(ModelView):
 
         return redirect(url_for('DocumentView.show', pk=doc))
 
+class CommentView(ModelView):
+    datamodel = SQLAInterface(Drascomment)
+    list_columns = ['ownerCommentComment','contractorReplyComment','ownerCounterReplyComment','finalComment', 'commentStatus', 'pos']
+    
+    list_widget = commentListWidget
+    label_columns = {
+        'ownerCommentBy': 'Owner',
+        'ownerCommentComment': 'Owner Comment',
+        'contractorReplyComment': 'Contractor Reply',
+        'ownerCounterReplyComment' : 'Owner Reply'
+    }
+   
+    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
+    def muldelete(self, items):
+        if isinstance(items, list):
+            self.datamodel.delete_all(items)
+            self.update_redirect()
+        else:
+            self.datamodel.delete(items)
+        return redirect(self.get_redirect())
+
+
+
 class DrasUploadView(ModelView):
-    datamodel = SQLAInterface(Commentsheet)
+    datamodel = SQLAInterface(Drascommentsheet)
     add_title = 'DRAS Upload'
     default_view = 'add'
     base_permissions = ['can_add'] 
@@ -346,104 +412,77 @@ class DrasUploadView(ModelView):
         return redirect(url_for('DocumentView.show', pk=doc))
 
 
-
-class RevisionView(ModelView):
-    datamodel = SQLAInterface(Revision)
-    list_columns = ['document','stage_class','name', 'current_cs'] 
-    related_views = [CommentSheetView, CommentView] 
-    #default_view = 'show'
-    list_widget = RevisionListCard
-    show_template = 'appbuilder/general/model/show_cascade.html'
-
-    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
-    def muldelete(self, items):
-        if isinstance(items, list):
-            self.datamodel.delete_all(items)
-            self.update_redirect()
-        else:
-            self.datamodel.delete(items)
-        return redirect(self.get_redirect())
-
-
- 
-
-
-class DocumentView(ModelView):
-    datamodel = SQLAInterface(Document)
-    related_views = [CommentSheetView, RevisionView, CommentView]
-    show_template = 'appbuilder/general/model/show_cascade.html'
-
-    list_columns = ['name','created_on','created_by']
-    show_columns = ['name','moc','dedoc']
-
-    label_columns = {
-        
-        'moc':'Main Operating Center',
-        'dedoc':'DED Operating Center'
-    }
-
-
-
-
-
-
-
-
-class DEDOperatingCenterView(ModelView):
-    datamodel = SQLAInterface(Dedoc)
-    #related_views = [CommentSheetView, RevisionView, CommentView]
-    #show_template = 'appbuilder/general/model/show_cascade.html'
-
-    list_columns = ['name','moc','created_on','created_by']
-
-class MainOperatingCenterView(ModelView):
-    datamodel = SQLAInterface(Moc)
-    related_views = [DEDOperatingCenterView]
-    show_template = 'appbuilder/general/model/show_cascade.html'
-
-    list_columns = ['name','created_on','created_by']
-
-class DisciplineView(ModelView):
-    datamodel = SQLAInterface(Discipline)
-    #related_views = [CommentSheetView, RevisionView, CommentView]
-    #show_template = 'appbuilder/general/model/show_cascade.html'
-
-    list_columns = ['name','created_on','created_by']
-
-class UnitView(ModelView):
-    datamodel = SQLAInterface(Unit)
-    #related_views = [CommentSheetView, RevisionView, CommentView]
-    #show_template = 'appbuilder/general/model/show_cascade.html'
-
-    list_columns = ['name','code','moc', 'dedoc', 'created_on','created_by']
-
-class SowView(ModelView):
-    datamodel = SQLAInterface(SplitOfWorks)
-    #related_views = [CommentSheetView, RevisionView, CommentView]
-    #show_template = 'appbuilder/general/model/show_cascade.html'
-
-    list_columns = ['id','unit.name','unit.code','discipline.name', 'oc','oc.moc']
-
-    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
-    def muldelete(self, items):
-        if isinstance(items, list):
-            self.datamodel.delete_all(items)
-            self.update_redirect()
-        else:
-            self.datamodel.delete(items)
-        return redirect(self.get_redirect())
-
-class IssueTypeView(ModelView):
-    datamodel = SQLAInterface(Issuetype)
-
-class ActionRequiredView(ModelView):
-    datamodel = SQLAInterface(Actionrequired)
 '''
-    DRAS Comment Sheet Section
 '''
+#appbuilder.add_view(RevisionView,'Revision',icon="fa-folder-open-o", category="DRAS", category_icon='fa-envelope')
 
-appbuilder.add_view(DocumentView, 'Document', icon="fa-folder-open-o",
+###
+##
+##    DRAS
+##  
+## 
+
+''' 
+
+
+
+
+
+
+
+
+
+
+
+
+"""    
+    Application wide 404 error handler
+"""
+@appbuilder.app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html', base_template=appbuilder.base_template, appbuilder=appbuilder), 404
+
+
+'''
+appbuilder.add_view(MidorewdDashboardView, "Early Works Documentation", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
+appbuilder.add_view(EarlyWorksDocView, "Engineering Documents", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
+appbuilder.add_view(EarlyWorksDocViewRestricted, "Engineering Documents PMC", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
+appbuilder.add_view(CorrespondenceView, "Correspondence", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
+appbuilder.add_view(Uop_BpdView, "UOP BDP List", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
+appbuilder.add_view(Uop_SpecView, "UOP Std. Specification", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
+
+
+appbuilder.add_view(DisciplineView, 'Discipline',
+                    icon="fa-folder-open-o", category="DRAS Components")
+
+appbuilder.add_view(MainOperatingCenterView, 'Main Operating Centers',
+                    icon="fa-folder-open-o", category="DRAS Components")
+
+appbuilder.add_view(DEDOperatingCenterView, 'DED Operating Centers', icon="fa-folder-open-o", category="DRAS Components")
+
+appbuilder.add_view(UnitView, 'Unit',
+                    icon="fa-folder-open-o", category="DRAS Components")
+
+appbuilder.add_view(SowView, 'Split of Works',
+                    icon="fa-folder-open-o", category="DRAS Components")
+
+
+appbuilder.add_view(DrasdocumentView, 'Document', icon="fa-folder-open-o",
                     category="DRAS", category_icon='fa-envelope')
+
+
+
+
+
+''''''
+
+
+
+
+
+
+
+
 
 appbuilder.add_view(RevisionView, 'Revision',
                     icon="fa-folder-open-o", category="DRAS")
@@ -460,9 +499,9 @@ appbuilder.add_separator(category="DRAS")
 appbuilder.add_view(DrasUploadView, 'Dras Upload',
                     icon="fa-folder-open-o", category="DRAS")
 
-'''
-    Split of Work
-'''
+
+
+
 appbuilder.add_view(IssueTypeView, 'Issue Type',
                     icon="fa-folder-open-o", category="DRAS Components")
 
@@ -471,24 +510,14 @@ appbuilder.add_view(ActionRequiredView, 'Action Required',
 
 appbuilder.add_separator(category="DRAS Components")
 
-appbuilder.add_view(UnitView, 'Unit',
-                    icon="fa-folder-open-o", category="DRAS Components")
 
-appbuilder.add_view(DisciplineView, 'Discipline',
-                    icon="fa-folder-open-o", category="DRAS Components")
+
 
 appbuilder.add_separator(category="DRAS Components")
 
-appbuilder.add_view(MainOperatingCenterView, 'Main Operating Centers',
-                    icon="fa-folder-open-o", category="DRAS Components")
 
-appbuilder.add_view(DEDOperatingCenterView, 'DED Operating Centers',
-                    icon="fa-folder-open-o", category="DRAS Components")
 
-appbuilder.add_view(SowView, 'Split of Works',
-                    icon="fa-folder-open-o", category="DRAS Components")
 
-'''
 
 #db.create_all()
 

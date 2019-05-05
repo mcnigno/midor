@@ -28,7 +28,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
 """    
-from app.comments import views
+#from app.comments import views
 from app import views
 
 

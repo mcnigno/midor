@@ -1,6 +1,7 @@
+'''
 import openpyxl
 from app import db
-from app.comments.models import Moc, Unit, Dedoc, SplitOfWorks, Discipline, Commentsheet
+from app.models import Moc, Unit, Dedoc, SplitOfWorks, Discipline, Commentsheet
 from app.comments.helpers import get_data_from_cs, get_fake_data_from_cs, get_fake_data_from_cs2
 from config import UPLOAD_FOLDER
 import uuid
@@ -234,20 +235,7 @@ def fakeItem(times):
                     fakefile = "fakeDrasOUT/" + csid +"_sep_" + fakedoc 
                     
                     copyfile(file, fakename)
-                    '''
-                    documentClientCode = Column(String(50))
-
-                    issuetype_id = Column(Integer, ForeignKey('issuetype.id'))
-                    issuetype = relationship(Issuetype)
-
-                    actionrequired_id = Column(Integer, ForeignKey('actionrequired.id'))
-                    actionrequired = relationship(Actionrequired)
-
-                    notificationItem = Column(String(50))
-                    actualDate = Column(Date)
-                    expectedDate = Column(Date)
-                    plannedDate = Column(Date)
-                    '''
+                    
                     cs = Commentsheet(cs_file=fakefile,
                             current=True,
                             created_by_fk='1',
@@ -387,4 +375,4 @@ def fakeItem3(times):
 #fakeItem2(['0020','0054'])
 #fakeItem3(100)
  
-     
+'''     

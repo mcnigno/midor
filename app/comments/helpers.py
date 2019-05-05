@@ -1,7 +1,7 @@
 
 from config import UPLOAD_FOLDER
 import openpyxl
-from .models import Document, Revision, Commentsheet, Comment, SplitOfWorks, Unit, Discipline
+from app.models import Drasdocument, Drasrevision, Drascommentsheet, Drascomment, Splitofworks, Unitmodel, Disciplinedras
 from datetime import datetime
 from flask import flash, abort
 from app import db
@@ -84,7 +84,7 @@ def update_data_from_cs(item):
         return abort(400, 'Error in your File Name.')
     #doc = session.query(Document).filter(Document.id == item.document_id).first()
 
-    rev = session.query(Revision).filter(Revision.id == item.revision_id).first()
+    rev = session.query(Drasrevision).filter(Drasrevision.id == item.drasrevision_id).first()
     
         
     rev.stage = item.stage
@@ -133,12 +133,12 @@ def update_data_from_cs(item):
         
         
 
-        doc = session.query(Document).filter(Document.name == document).first()
-        session.query(Comment).filter(Comment.document_id == doc.id).delete()
+        doc = session.query(Drasdocument).filter(Drasdocument.name == document).first()
+        session.query(Drascomment).filter(Drascomment.drasdocument_id == doc.id).delete()
         
-        cs_list = session.query(Commentsheet).filter( 
-                                    Document.id == doc.id,
-                                    Commentsheet.current == True).all()
+        cs_list = session.query(Drascommentsheet).filter( 
+                                    Drasdocument.id == doc.id,
+                                    Drascommentsheet.current == True).all()
         #item.stage = rev_stage
         for cs in cs_list:  
             cs.current = False
@@ -153,10 +153,10 @@ def update_data_from_cs(item):
 
             if row[0].value is not None:
                 #print(row[0].value) 
-                comment = Comment(
+                comment = Drascomment(
 
-                    revision_id = rev.id,
-                    commentsheet = item,
+                    drasrevision_id = rev.id,
+                    drascommentsheet = item,
 
                     pos = row[0].value,
                     tag = row[1].value,
@@ -182,9 +182,9 @@ def update_data_from_cs(item):
                 print(item.current)
                 if item.current == True:
                     
-                    comment.document_id = doc.id
+                    comment.drasdocument_id = doc.id
                     
-                    print(comment.document_id, doc.id)
+                    print(comment.drasdocument_id, doc.id)
                     
 
                 
@@ -200,13 +200,13 @@ def update_data_from_cs(item):
 
 def get_oc(unit, discipline):
     session = db.session
-    unit_id = session.query(Unit).filter(Unit.code == unit).first()
-    discipline_id = session.query(Discipline).filter(Discipline.name == discipline).first()
+    unit_id = session.query(Unitmodel).filter(Unitmodel.code == unit).first()
+    discipline_id = session.query(Disciplinedras).filter(Disciplinedras.name == discipline).first()
     
     if unit_id and discipline_id:
-        splitOfWorks = session.query(SplitOfWorks).filter(
-                    SplitOfWorks.unit_id == unit_id.id,
-                    SplitOfWorks.discipline_id == discipline_id.id).first()
+        splitOfWorks = session.query(Splitofworks).filter(
+                    Splitofworks.unit_id == unit_id.id,
+                    Splitofworks.discipline_id == discipline_id.id).first()
     
         return unit_id.moc_id, splitOfWorks.oc_id
     if unit_id:
@@ -239,7 +239,7 @@ def get_data_from_cs(item):
     except:
         abort(400, 'Error in file name. Check Your File!')
 
-    doc = session.query(Document).filter(Document.name == document).first()
+    doc = session.query(Drasdocument).filter(Drasdocument.name == document).first()
     
     if doc is None:
         #fake Discipline
@@ -249,20 +249,20 @@ def get_data_from_cs(item):
         print('DOC is NONE *-----------           ************')
         moc, dedoc = get_oc(oc_unit, discipline)
         print('MOC - DEDOC ', moc, dedoc)
-        doc = Document(name=document, moc_id=moc, dedoc_id=dedoc)
+        doc = Drasdocument(name=document, moc_id=moc, dedoc_id=dedoc)
         session.add(doc)
         print('Document',doc.name)
 
     # session flush for doc id
     # search the same rev for this document by doc id
 
-    rev = session.query(Revision).filter(Revision.name == revision, Revision.document_id == doc.id).first() 
+    rev = session.query(Drasrevision).filter(Drasrevision.name == revision, Drasrevision.document_id == doc.id).first() 
     print('searching for revision, document:', revision, document)
     print('found', rev)
     if rev is None:
         print(rev)
         print('    ----------     Rev is None: ', revision, rev_stage, document)
-        rev = Revision(name=revision, document=doc)
+        rev = Drasrevision(name=revision, drasdocument=doc)
         session.add(rev)
         
     rev.stage = rev_stage
@@ -302,9 +302,9 @@ def get_data_from_cs(item):
     '''
     
     if item.current:
-        session.query(Comment).filter(Comment.document_id == doc.id).delete()
+        session.query(Drascomment).filter(Drascomment.drasdocument_id == doc.id).delete()
         
-        commentSheets = session.query(Commentsheet).filter(Commentsheet.document_id == doc.id).all()
+        commentSheets = session.query(Drascommentsheet).filter(Drascommentsheet.drasdocument_id == doc.id).all()
         item.stage = rev_stage
 
         for cs in commentSheets:
@@ -315,9 +315,9 @@ def get_data_from_cs(item):
             #print('CommentStatus', row[0].value,row[9].value,row[10].value,row[11].value, type(row[11].value))
             if row[0].value is not None:
                 #print(row[0].value) 
-                comment = Comment(
-                    revision_id = rev.id,
-                    commentsheet = item,
+                comment = Drascomment(
+                    drasrevision_id = rev.id,
+                    drascommentsheet = item,
 
                     pos = row[0].value,
                     tag = row[1].value,
@@ -341,7 +341,7 @@ def get_data_from_cs(item):
                 )
                 if item.current:  
                     
-                    comment.document_id = doc.id
+                    comment.drasdocument_id = doc.id
                     
 
                 #print('Contractor Status:',len(comment.contractorReplyStatus),comment.contractorReplyStatus)
@@ -532,7 +532,7 @@ def get_fake_data_from_cs2(item):
     except:
         abort(400, 'Error in file name. Check Your File!')
 
-    doc = session.query(Document).filter(Document.name == document).first()
+    doc = session.query(Drasdocument).filter(Drasdocument.name == document).first()
     
     if doc is None:
         
@@ -540,7 +540,7 @@ def get_fake_data_from_cs2(item):
         #print('DOC is NONE *-----------           ************')
         moc, dedoc = get_oc(oc_unit, discipline)
         #print('MOC - DEDOC ', moc, dedoc)
-        doc = Document(name=document, 
+        doc = Drasdocument(name=document, 
                         moc_id=moc, 
                         dedoc_id=dedoc,
                         created_by_fk='1',
@@ -552,7 +552,7 @@ def get_fake_data_from_cs2(item):
     # session flush for doc id
     # search the same rev for this document by doc id
 
-    rev = session.query(Revision).filter(Revision.name == revision, Revision.document_id == doc.id).first() 
+    rev = session.query(Drasrevision).filter(Drasrevision.name == revision, Drasrevision.drasdocument_id == doc.id).first() 
     print('searching for revision, document:', revision,rev_stage, document)
     #print('found', rev)
     #rev.stage = rev_stage
@@ -563,7 +563,7 @@ def get_fake_data_from_cs2(item):
     else:
         #print(rev)
         #print('    ----------     Rev is None: ', revision, rev_stage, document)
-        rev = Revision(name=revision, document=doc,
+        rev = Drasrevision(name=revision, drasdocument=doc,
                 created_by_fk='1',
                 changed_by_fk='1',
                 stage=rev_stage)
@@ -606,9 +606,9 @@ def get_fake_data_from_cs2(item):
     '''
     
     if item.current:
-        session.query(Comment).filter(Comment.document_id == doc.id).delete()
+        session.query(Drascomment).filter(Drascomment.drasdocument_id == doc.id).delete()
         
-        commentSheets = session.query(Commentsheet).filter(Commentsheet.document_id == doc.id).all()
+        commentSheets = session.query(Drascommentsheet).filter(Drascommentsheet.drasdocument_id == doc.id).all()
         item.stage = rev_stage
 
         for cs in commentSheets:
@@ -629,9 +629,9 @@ def get_fake_data_from_cs2(item):
             #print('CommentStatus', row[0].value,row[9].value,row[10].value,row[11].value, type(row[11].value))
             if row[0].value is not None:
                 #print(row[0].value) 
-                comment = Comment(
-                    revision_id = rev.id,
-                    commentsheet = item,
+                comment = Drascomment(
+                    drasrevision_id = rev.id,
+                    drascommentsheet = item,
 
                     pos = row[0].value,
                     tag = row[1].value,

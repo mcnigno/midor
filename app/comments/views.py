@@ -1,3 +1,4 @@
+'''
 from flask_appbuilder.baseviews import BaseView, expose
 from flask_appbuilder import ModelView, action, MasterDetailView, MultipleView
 from flask_appbuilder.models.sqla.interface import SQLAInterface
@@ -351,9 +352,10 @@ class IssueTypeView(ModelView):
 
 class ActionRequiredView(ModelView):
     datamodel = SQLAInterface(Actionrequired)
-'''
-    DRAS Comment Sheet Section
-'''
+
+
+
+
 
 appbuilder.add_view(DocumentView, 'Document', icon="fa-folder-open-o",
                     category="DRAS", category_icon='fa-envelope')
@@ -373,9 +375,7 @@ appbuilder.add_separator(category="DRAS")
 appbuilder.add_view(DrasUploadView, 'Dras Upload',
                     icon="fa-folder-open-o", category="DRAS")
 
-'''
-    Split of Work
-'''
+
 appbuilder.add_view(IssueTypeView, 'Issue Type',
                     icon="fa-folder-open-o", category="DRAS Components")
 
@@ -406,3 +406,4 @@ appbuilder.add_view(SowView, 'Split of Works',
 db.create_all()
 
 #add_moc()
+'''

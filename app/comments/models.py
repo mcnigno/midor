@@ -1,3 +1,5 @@
+
+'''
 from flask_appbuilder import Model
 from flask_appbuilder.models.mixins import AuditMixin, FileColumn, ImageColumn
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, Boolean
@@ -5,11 +7,14 @@ from sqlalchemy.orm import relationship
 from flask import Markup, url_for
 from flask_appbuilder.filemanager import get_file_original_name
 from app import db
+'''
 
 
 
 
-class Discipline(Model, AuditMixin):
+'''
+
+class Moc(Model, AuditMixin):
     id = Column(Integer, primary_key=True)
 
     name = Column(String(100), unique=True, nullable=False)
@@ -17,8 +22,7 @@ class Discipline(Model, AuditMixin):
     def __repr__(self):
         return self.name
 
-
-class Moc(Model, AuditMixin):
+class Discipline(Model, AuditMixin):
     id = Column(Integer, primary_key=True)
 
     name = Column(String(100), unique=True, nullable=False)
@@ -252,6 +256,6 @@ class Comment(Model, AuditMixin):
         if self.finalAgreementComment:
             return self.finalAgreementComment 
         return ' | Without Final Comments.'
-
+'''
 
 
