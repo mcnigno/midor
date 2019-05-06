@@ -423,7 +423,8 @@ class DrasUploadView(ModelView):
         'notificationItem':'Notification Item',
         'actualDate': 'Actual Date', 
         'expectedDate': 'Expected Date',
-        'plannedDate': 'Planned Date'
+        'plannedDate': 'Planned Date',
+        'cs_file': 'File'
     }
     
     add_fieldsets = [
@@ -440,7 +441,7 @@ class DrasUploadView(ModelView):
         
         (lazy_gettext('DRAS Internal Info'),
          {'fields': ['note'], 
-                    'expanded': False}),
+                    'expanded': True}),
         
     ]
     #related_views = [CommentView]
