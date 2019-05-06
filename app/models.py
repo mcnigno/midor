@@ -218,6 +218,15 @@ class Drasdocument(Model, AuditMixin):
     def __repr__(self):
         return self.name
 
+    def open_comm(self):
+        session = db.session
+        open_comm = session.query(Drascomment).filter(Drascomment.drasdocument_id == self.id,
+                                            Drascomment.commentStatus == 'Open').all()
+        return len(open_comm)
+
+    def title_name(self):
+        return Markup('<span class="document_title">' + self.name + '</span>')
+
 class Drasrevision(Model, AuditMixin):
     id = Column(Integer, primary_key=True)
     name = Column(String(5), nullable=False)

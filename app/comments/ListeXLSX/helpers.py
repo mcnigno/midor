@@ -424,4 +424,4 @@ def fakeItem3(times):
  
  
 #init_dras()
-fakeItem3(40)
+#fakeItem3(40)

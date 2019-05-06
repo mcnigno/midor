@@ -82,7 +82,6 @@ class Uop_SpecView(ModelView):
     list_columns = ['document_code', 'revision', 'doc_description', 'file']
     list_template = 'listUop_spec.html' 
 
-
 class DisciplineView(ModelView):
     datamodel = SQLAInterface(Disciplinedras)
     #related_views = [CommentSheetView, RevisionView, CommentView]
@@ -104,14 +103,12 @@ class MainOperatingCenterView(ModelView):
 
     list_columns = ['name','created_on','created_by']
 
-
 class UnitView(ModelView):
     datamodel = SQLAInterface(Unitmodel)
     #related_views = [CommentSheetView, RevisionView, CommentView]
     #show_template = 'appbuilder/general/model/show_cascade.html'
 
     list_columns = ['name','code','moc', 'dedoc', 'created_on','created_by']
-
 
 class SowView(ModelView):
     datamodel = SQLAInterface(Splitofworks)
@@ -142,12 +139,12 @@ class ActionRequiredView(ModelView):
 
 class CommentSheetView(ModelView):
     datamodel = SQLAInterface(Drascommentsheet)
-    add_title = 'DRAS View'
-    edit_title = 'DRAS Edit'
-    list_title = 'DRAS List'
-    show_title = 'DRAS Show'
+    add_title = 'View DRAS'
+    edit_title = 'Edit DRAS'
+    list_title = 'List DRAS History'
+    show_title = 'Show DRAS'
     add_columns = ['cs_file', 'current'] 
-    list_columns = ['created_on','stage_icon','documentReferenceRev','filename', 'is_current', 'download'] 
+    list_columns = ['documentReferenceRev','stage_icon','filename', 'is_current', 'download'] 
     label_columns = {
         'documentReferenceDoc':     'Document',
         'documentReferenceRev':     'Revision', 
@@ -286,14 +283,63 @@ class CommentSheetView(ModelView):
 class CommentView(ModelView):
     datamodel = SQLAInterface(Drascomment)
     list_columns = ['ownerCommentComment','contractorReplyComment','ownerCounterReplyComment','finalComment', 'commentStatus', 'pos']
-    
+    show_title = 'Show Comment'
+    list_title = 'List Comments'
+    add_title = 'Add Comment'
+    edit_title = 'Edit Comment' 
     list_widget = commentListWidget
     label_columns = {
-        'ownerCommentBy': 'Owner',
-        'ownerCommentComment': 'Owner Comment',
-        'contractorReplyComment': 'Contractor Reply',
-        'ownerCounterReplyComment' : 'Owner Reply'
+        'ownerCommentBy': 'by',
+        'ownerCommentDate': 'Date',
+        'ownerCommentComment': 'Owner:',
+
+        'contractorReplyDate': 'Date',
+        'contractorReplyStatus': 'Status',
+        'contractorReplyComment': 'Contractor:',
+
+        'ownerCounterReplyDate': 'Date',
+        'ownerCounterReplyComment' : 'Owner:',
+
+        'finalAgreementDate': 'Agreement Date', 
+        'finalAgreemntCommentDate':'Comment Date', 
+        'finalAgreementComment': 'Agreement:',
+        'commentStatus': 'Status'
+        
     }
+
+    show_fieldsets = [
+        (lazy_gettext('DRAS Comment'),
+
+         {'fields': ['pos', 'tag', 'info']}),
+        
+        (lazy_gettext('Owner Comment'),
+
+         {'fields': ['ownerCommentBy', 
+                    'ownerCommentDate', 
+                    'ownerCommentComment'], 'expanded': True}),
+        
+        (lazy_gettext('Contractor Reply'),
+
+         {'fields': ['contractorReplyDate', 
+                    'contractorReplyStatus', 
+                    'contractorReplyComment'], 
+                    'expanded': False}),
+        
+        (lazy_gettext('Owner Counter Reply'), 
+
+         {'fields': ['ownerCounterReplyDate', 
+                    'ownerCounterReplyComment',], 
+                    'expanded': False}),
+        
+        (lazy_gettext('Final Agreement'),
+
+         {'fields': ['finalAgreementDate', 
+                    'finalAgreemntCommentDate', 
+                    'finalAgreementComment',
+                    'commentStatus'], 'expanded': False}),
+        
+        
+    ]
    
     @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
     def muldelete(self, items):
@@ -306,8 +352,17 @@ class CommentView(ModelView):
 
 class RevisionView(ModelView):
     datamodel = SQLAInterface(Drasrevision)
-    list_columns = ['document','stage_class','name', 'current_cs'] 
-    related_views = [CommentSheetView, CommentView] 
+    list_columns = ['drasdocument','stage_class','name', 'current_cs']
+    show_columns = ['drasdocument','stage_class','name', 'current_cs']
+    label_columns = {
+        'drasdocument':'Document'
+    }
+    
+    show_title = 'Show Revision'
+    list_title = 'List Revision'
+    add_title = 'Add Revision'
+    edit_title = 'Edit Revision' 
+    related_views = [CommentSheetView] 
     #default_view = 'show'
     list_widget = RevisionListCard
     show_template = 'appbuilder/general/model/show_cascade.html'
@@ -326,13 +381,20 @@ class DrasdocumentView(ModelView):
     related_views = [CommentSheetView, RevisionView, CommentView]
     show_template = 'appbuilder/general/model/show_cascade.html'
 
-    list_columns = ['name','created_on','created_by']
-    show_columns = ['name','moc','dedoc']
+    list_columns = ['name','moc','dedoc', 'open_comm' ] 
+    show_columns = ['title_name','moc','dedoc']
+    show_title = 'Show Document'
+    list_title = 'List Document'
+    add_title = 'Add Document'
+    edit_title = 'Edit Document'
+
 
     label_columns = {
         
         'moc':'Main Operating Center',
-        'dedoc':'DED Operating Center'
+        'dedoc':'DED Operating Center',
+        'title_name': 'Document'
+         
     }
 
 class DrasUploadView(ModelView):
