@@ -94,7 +94,11 @@ class DEDOperatingCenterView(ModelView):
     #related_views = [CommentSheetView, RevisionView, CommentView]
     #show_template = 'appbuilder/general/model/show_cascade.html'
 
-    list_columns = ['name','moc','created_on','created_by']
+    list_columns = ['name','moc']
+    label_columns = {
+        'moc':'MOC',
+        'name': 'Name'
+    }
 
 class MainOperatingCenterView(ModelView):
     datamodel = SQLAInterface(Mocmodel)
@@ -108,14 +112,29 @@ class UnitView(ModelView):
     #related_views = [CommentSheetView, RevisionView, CommentView]
     #show_template = 'appbuilder/general/model/show_cascade.html'
 
-    list_columns = ['name','code','moc', 'dedoc', 'created_on','created_by']
+    list_columns = ['name','code','moc', 'dedoc']
+    label_columns = {
+        'moc':'Main OC',
+        'dedoc':'DED OC', 
+        'name': 'Title',
+        'code': 'Unit'
+    }
 
 class SowView(ModelView):
     datamodel = SQLAInterface(Splitofworks)
     #related_views = [CommentSheetView, RevisionView, CommentView]
     #show_template = 'appbuilder/general/model/show_cascade.html'
 
-    #list_columns = ['id','unit.name','unit.code','discipline.name', 'oc','oc.moc']
+
+    list_columns = ['unitmodel.code','unitmodel.name','disciplinedras.name','oc.moc','oc']
+    show_columns = list_columns = ['unitmodel.code','unitmodel.name','disciplinedras.name','oc.moc','oc']
+    label_columns = {
+        'unitmodel.name':'Unit Title',
+        'unitmodel.code':'Unit',
+        'disciplinedras.name': 'Discipline',
+        'oc': 'DED OC',
+        'oc.moc': 'MAIN OC'
+    }
 
     @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
     def muldelete(self, items):
@@ -180,31 +199,30 @@ class CommentSheetView(ModelView):
          {'fields': ['documentReferenceDoc', 
                     'documentReferenceRev', 
                     'documentReferenceDesc',
-                    'documentReferenceBy'], 'expanded': True}),
+                    'documentReferenceBy',
+                    'issuetype'], 'expanded': True}),
         
         (lazy_gettext('Owner Transmittal Reference'),
 
          {'fields': ['ownerTransmittalReference', 
                     'ownerTransmittalDate', 
                     'response_status'], 
-                    'expanded': False}),
+                    'expanded': True}),
         
         (lazy_gettext('Contractor Trasmittal Reference'), 
 
          {'fields': ['contractorTransmittalReference', 
                     'contractorTransmittalDate', 
                     'contractorTransmittalMr',
-                    'contractorTransmittalVendor'], 
-                    'expanded': False}),
+                    'contractorTransmittalVendor',
+                    'actionrequired'], 
+                    'expanded': True}),
         
         (lazy_gettext('DRAS Notification'),
 
-         {'fields': ['issuetype', 
-                    'actionrequired', 
-                    'notificationItem',
+         {'fields': ['notificationItem',
                     'actualDate', 
-                    'expectedDate',
-                    'plannedDate'], 'expanded': False}),
+                    'expectedDate'], 'expanded': True}),
         
         (lazy_gettext('DRAS Internal Info'),
 
@@ -282,12 +300,13 @@ class CommentSheetView(ModelView):
 
 class CommentView(ModelView):
     datamodel = SQLAInterface(Drascomment)
-    list_columns = ['ownerCommentComment','contractorReplyComment','ownerCounterReplyComment','finalComment', 'commentStatus', 'pos']
+    list_columns = ['tag','ownerCommentComment','contractorReplyStatus','contractorReplyComment','ownerCounterReplyComment','finalComment', 'commentStatus', 'pos']
     show_title = 'Show Comment'
     list_title = 'List Comments'
     add_title = 'Add Comment'
     edit_title = 'Edit Comment' 
-    list_widget = commentListWidget
+    search_columns = ['commentStatus']
+    list_widget = commentListWidget 
     label_columns = {
         'ownerCommentBy': 'by',
         'ownerCommentDate': 'Date',
@@ -355,7 +374,10 @@ class RevisionView(ModelView):
     list_columns = ['drasdocument','stage_class','name', 'current_cs']
     show_columns = ['drasdocument','stage_class','name', 'current_cs']
     label_columns = {
-        'drasdocument':'Document'
+        'drasdocument':'Document',
+        'stage_class':'Stage',
+        'name': 'Name',
+        'current_cs': 'Status'
     }
     
     show_title = 'Show Revision'
@@ -382,7 +404,7 @@ class DrasdocumentView(ModelView):
     show_template = 'appbuilder/general/model/show_cascade.html'
 
     list_columns = ['name','moc','dedoc', 'open_comm' ] 
-    show_columns = ['title_name','moc','dedoc']
+    show_columns = ['title_name','moc','dedoc','current_rev','current_stage']
     show_title = 'Show Document'
     list_title = 'List Document'
     add_title = 'Add Document'
@@ -393,7 +415,10 @@ class DrasdocumentView(ModelView):
         
         'moc':'Main Operating Center',
         'dedoc':'DED Operating Center',
-        'title_name': 'Document'
+        'title_name': 'Document',
+        'current_rev': 'Current Rev',
+        'current_stage': 'Stage'
+
          
     }
 
@@ -436,8 +461,7 @@ class DrasUploadView(ModelView):
                     'actionrequired', 
                     'notificationItem',
                     'actualDate', 
-                    'expectedDate',
-                    'plannedDate'], 'expanded': True}),
+                    'expectedDate'], 'expanded': True}),
         
         (lazy_gettext('DRAS Internal Info'),
          {'fields': ['note'], 

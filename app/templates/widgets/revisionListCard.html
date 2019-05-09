@@ -23,7 +23,7 @@
         {% endif %}
         
         {% if can_show or can_edit or can_delete %}
-        <small>REV ID: {{ pk }}</small>
+        
             {{ lib.btn_crud(can_show, can_edit, can_delete, pk, modelview_name, filters) }}
             
             {% endif %}

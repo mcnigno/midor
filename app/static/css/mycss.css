@@ -226,6 +226,12 @@ i.fa.fa-file-word-o {
     text-align: justify;
     padding: 15px;
 }
+#comment_row_contractorReplyStatus{
+    background-color: rgb(241, 241, 244);
+    width: 10%;
+    text-align: justify;
+    padding: 15px;
+}
 
 .revision {
     text-align: center;

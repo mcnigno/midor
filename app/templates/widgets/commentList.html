@@ -21,7 +21,7 @@
             <th class="col-md-1 col-lg-1 col-sm-1" ></th>
         {% endif %}
 
-        {% set commentlist = ['ownerCommentComment', 'contractorReplyComment','ownerCounterReplyComment' ] %}
+        {% set commentlist = ['tag', 'ownerCommentComment','contractorReplyStatus', 'contractorReplyComment','ownerCounterReplyComment' ] %}
         {% for item in commentlist %}
             {% if item != 'commentStatus' and item != 'finalComment' %}   
                 {% if item in order_columns %}
@@ -64,7 +64,7 @@
                 {% endif %}
                 
                 
-                    {% set commentlist = ['ownerCommentComment', 'contractorReplyComment','ownerCounterReplyComment' ] %}
+                    {% set commentlist = ['tag', 'ownerCommentComment','contractorReplyStatus', 'contractorReplyComment','ownerCounterReplyComment' ] %}
                     {% for value in commentlist %}
                         {% set formatter = formatters_columns.get(value) %}
 
@@ -90,7 +90,7 @@
             <tr class="final-comment">
 
                 <td colspan="2" ><strong> {{ item['pos']}} </strong></td>
-                <td colspan="3" class="finalComment"><strong> {{ item['commentStatus']}} </strong> {{ item['finalComment'] }}</td>
+                <td colspan="5" class="finalComment"><strong> {{ item['commentStatus']}} </strong> {{ item['finalComment'] }}</td>
             
             </tr>
             <tr class="final-comment-footer"></tr>
