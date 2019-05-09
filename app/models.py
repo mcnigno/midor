@@ -227,6 +227,18 @@ class Drasdocument(Model, AuditMixin):
     def title_name(self):
         return Markup('<span class="document_title">' + self.name + '</span>')
 
+    def current_rev(self):
+        session = db.session
+        cs = session.query(Drascommentsheet).filter(Drascommentsheet.drasdocument_id == self.id,
+                                            Drascommentsheet.current == True).first()
+        return cs.drasrevision
+    
+    def current_stage(self):
+        session = db.session
+        cs = session.query(Drascommentsheet).filter(Drascommentsheet.drasdocument_id == self.id,
+                                            Drascommentsheet.current == True).first()
+        return cs.stage
+        
 class Drasrevision(Model, AuditMixin):
     id = Column(Integer, primary_key=True)
     name = Column(String(5), nullable=False)
