@@ -84,7 +84,7 @@ class Uop_SpecView(ModelView):
 
 
 
-'''
+
 
 class UnitView(ModelView):
     datamodel = SQLAInterface(Unitmodel)
@@ -502,10 +502,8 @@ class DrasUploadView(ModelView):
         print('POST EDIT FUNCTION ************ ',session['last_document'] )
 
         return redirect(url_for('DrasdocumentView.show', pk=doc))
-'''
 
-'''
-'''
+
 #appbuilder.add_view(RevisionView,'Revision',icon="fa-folder-open-o", category="DRAS", category_icon='fa-envelope')
 
 
@@ -527,7 +525,7 @@ appbuilder.add_view(CorrespondenceView, "Correspondence", icon="fa-folder-open-o
 appbuilder.add_view(Uop_BpdView, "UOP BDP List", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 appbuilder.add_view(Uop_SpecView, "UOP Std. Specification", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 
-'''
+
 appbuilder.add_view(MainOperatingCenterView, 'Main Operating Centers',icon="fa-folder-open-o", category="DRAS Components")
 
 appbuilder.add_view(DEDOperatingCenterView, 'DED Operating Centers', icon="fa-folder-open-o", category="DRAS Components")
@@ -585,7 +583,7 @@ appbuilder.add_separator(category="DRAS Components")
 
 appbuilder.add_separator(category="DRAS Components")
 
-'''
+
 
 
 
