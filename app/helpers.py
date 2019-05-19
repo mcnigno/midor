@@ -4,7 +4,7 @@ from app import db
 from datetime import datetime
 import os
 
-wb = openpyxl.load_workbook('midor/xlsx/midorewd.xlsx')
+wb = openpyxl.load_workbook('./xlsx/midorewd.xlsx')
 ws = wb.active
 session = db.session
 file_list = []
