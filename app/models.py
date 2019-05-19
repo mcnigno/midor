@@ -70,7 +70,6 @@ class Correspondence(Model):
             return 'ND'
 
 
-'UOP BDP Section	Doc. Description	Rev'
 
 class Uop_Bpd(Model):
     id = Column(Integer, primary_key=True)
@@ -96,7 +95,7 @@ class Uop_Bpd(Model):
         except:
             return 'ND'
 
-'Document Code	Document type	Description	Revision'
+
 class Uop_spec(Model):
     id = Column(Integer, primary_key=True)
     document_code = Column(String(50))
@@ -118,26 +117,6 @@ class Uop_spec(Model):
                 return '<i class="fa fa-file-pdf-o" aria-hidden="true"></i>'
         except:
             return 'ND'
-
-
-
-# 
-# 
-#  
-#  DRAS
-#
-#
-#
-
-
-
-
-
-
-
- 
-
-
 
 
 

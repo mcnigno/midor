@@ -21,7 +21,7 @@ from app.models import (Disciplinedras, Mocmodel, Dedocmodel, Unitmodel,
                         Drasactionrequired, Drascommentsheet, Drascomment)
 
 
-from app import appbuilder, db
+#from app import appbuilder, db
 from app.comments.helpers import check_labels, get_data_from_cs
 from flask import session, redirect, url_for, abort
 from app.comments.customWidgets import commentListWidget, RevisionListCard
@@ -32,7 +32,7 @@ from app.comments.helpers import update_data_from_cs
 from flask_babel import lazy_gettext
 
 
-from app.comments.ListeXLSX.helpers import fakeItem3
+#from app.init_helpers import fakeItem3
 
 '''
 from app.comments.views import (DocumentView, RevisionView, CommentSheetView, 
@@ -82,12 +82,22 @@ class Uop_SpecView(ModelView):
     list_columns = ['document_code', 'revision', 'doc_description', 'file']
     list_template = 'listUop_spec.html' 
 
-class DisciplineView(ModelView):
-    datamodel = SQLAInterface(Disciplinedras)
+
+
+'''
+
+class UnitView(ModelView):
+    datamodel = SQLAInterface(Unitmodel)
     #related_views = [CommentSheetView, RevisionView, CommentView]
     #show_template = 'appbuilder/general/model/show_cascade.html'
 
-    list_columns = ['name','created_on','created_by']
+    list_columns = ['name','code','moc', 'dedoc']
+    label_columns = {
+        'moc':'Main OC',
+        'dedoc':'DED OC', 
+        'name': 'Title',
+        'code': 'Unit'
+    }
 
 class DEDOperatingCenterView(ModelView):
     datamodel = SQLAInterface(Dedocmodel)
@@ -107,18 +117,12 @@ class MainOperatingCenterView(ModelView):
 
     list_columns = ['name','created_on','created_by']
 
-class UnitView(ModelView):
-    datamodel = SQLAInterface(Unitmodel)
+class DisciplineView(ModelView):
+    datamodel = SQLAInterface(Disciplinedras)
     #related_views = [CommentSheetView, RevisionView, CommentView]
     #show_template = 'appbuilder/general/model/show_cascade.html'
 
-    list_columns = ['name','code','moc', 'dedoc']
-    label_columns = {
-        'moc':'Main OC',
-        'dedoc':'DED OC', 
-        'name': 'Title',
-        'code': 'Unit'
-    }
+    list_columns = ['name','created_on','created_by']
 
 class SowView(ModelView):
     datamodel = SQLAInterface(Splitofworks)
@@ -144,10 +148,6 @@ class SowView(ModelView):
         else:
             self.datamodel.delete(items)
         return redirect(self.get_redirect())
-
-
-
-
 
 
 class IssueTypeView(ModelView):
@@ -502,26 +502,11 @@ class DrasUploadView(ModelView):
         print('POST EDIT FUNCTION ************ ',session['last_document'] )
 
         return redirect(url_for('DrasdocumentView.show', pk=doc))
-
+'''
 
 '''
 '''
 #appbuilder.add_view(RevisionView,'Revision',icon="fa-folder-open-o", category="DRAS", category_icon='fa-envelope')
-
-###
-##
-##    DRAS
-##  
-## 
-
-''' 
-
-
-
-
-
-
-
 
 
 
@@ -535,7 +520,6 @@ def page_not_found(e):
     return render_template('404.html', base_template=appbuilder.base_template, appbuilder=appbuilder), 404
 
 
-'''
 appbuilder.add_view(MidorewdDashboardView, "Early Works Documentation", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
 appbuilder.add_view(EarlyWorksDocView, "Engineering Documents", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 appbuilder.add_view(EarlyWorksDocViewRestricted, "Engineering Documents PMC", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
@@ -543,30 +527,24 @@ appbuilder.add_view(CorrespondenceView, "Correspondence", icon="fa-folder-open-o
 appbuilder.add_view(Uop_BpdView, "UOP BDP List", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 appbuilder.add_view(Uop_SpecView, "UOP Std. Specification", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 
-
-appbuilder.add_view(DisciplineView, 'Discipline',
-                    icon="fa-folder-open-o", category="DRAS Components")
-
-appbuilder.add_view(MainOperatingCenterView, 'Main Operating Centers',
-                    icon="fa-folder-open-o", category="DRAS Components")
+'''
+appbuilder.add_view(MainOperatingCenterView, 'Main Operating Centers',icon="fa-folder-open-o", category="DRAS Components")
 
 appbuilder.add_view(DEDOperatingCenterView, 'DED Operating Centers', icon="fa-folder-open-o", category="DRAS Components")
 
-appbuilder.add_view(UnitView, 'Unit',
-                    icon="fa-folder-open-o", category="DRAS Components")
+appbuilder.add_view(UnitView, 'Unit',icon="fa-folder-open-o", category="DRAS Components")
 
-appbuilder.add_view(SowView, 'Split of Works',
-                    icon="fa-folder-open-o", category="DRAS Components")
+appbuilder.add_view(DisciplineView, 'Discipline',icon="fa-folder-open-o", category="DRAS Components")
 
 
-appbuilder.add_view(DrasdocumentView, 'Document', icon="fa-folder-open-o",
-                    category="DRAS", category_icon='fa-envelope')
+appbuilder.add_view(SowView, 'Split of Works',icon="fa-folder-open-o", category="DRAS Components")
 
+appbuilder.add_view(DrasdocumentView, 'Document', icon="fa-folder-open-o",category="DRAS", category_icon='fa-envelope')
 
 
 
 
-''''''
+
 
 
 
@@ -607,7 +585,7 @@ appbuilder.add_separator(category="DRAS Components")
 
 appbuilder.add_separator(category="DRAS Components")
 
-
+'''
 
 
 

@@ -1,5 +1,3 @@
-
-'''
 import openpyxl
 from app import db
 from app.models import (Mocmodel, Unitmodel, Dedocmodel,
@@ -13,7 +11,7 @@ from flask_appbuilder.filemanager import FileManager
 from flask import current_app
 import random
 
-path = 'app/comments/ListeXLSX/OperatingCenter.xlsx'
+path = 'midor/app/comments/ListeXLSX/OperatingCenter.xlsx'
 workbook = openpyxl.load_workbook(path)
 worksheet = workbook.active
 
@@ -215,7 +213,9 @@ def init_dras():
 
 ##
 ##  Test
-##  
+## 
+#  
+'''
 from random import random, randint
 session = db.session
 fakeUnitList = session.query(Unitmodel).all()
@@ -242,9 +242,7 @@ def fakeDoc(revision,stage):
 
 #fakeDoc(90000)
 # 
-# 
 #  
-
 import random
 from datetime import datetime, timedelta
 
@@ -306,7 +304,7 @@ def fakeItem(times):
 
 def fakeItem2(serials):
     session = db.session
-    units = session.query(Unit).all()
+    units = session.query(Unitmodel).all()
     doctypes = ['MOM','PID','MR','SOW']
     revisions = ['A','B','C']
     stages = ['Y','Y1','Y2','YF']
@@ -334,7 +332,7 @@ def fakeItem2(serials):
                             
                             copyfile(file, fakename)
                            
-                            cs = Commentsheet(cs_file=fakefile,
+                            cs = Drascommentsheet(cs_file=fakefile,
                                     current=True,
                                     created_by_fk='1',
                                     changed_by_fk='1',
@@ -419,13 +417,12 @@ def fakeItem3(times):
                        
     session.commit()
     
-
+'''
 #fakeItem(1)                  
 #fakeItem2(['0020','0054','0124','0155','0034'])
 #fakeItem2(['0020','0054'])
 #fakeItem3(99)
  
  
-init_dras()
+#init_dras()
 #fakeItem3(40)
-'''

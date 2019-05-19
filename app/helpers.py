@@ -4,7 +4,7 @@ from app import db
 from datetime import datetime
 import os
 
-wb = openpyxl.load_workbook('xlsx/midorewd.xlsx')
+wb = openpyxl.load_workbook('midor/xlsx/midorewd.xlsx')
 ws = wb.active
 session = db.session
 file_list = []
@@ -160,4 +160,5 @@ def check_extension(document_code, file_dict):
 #print(error_list)
 #upload_uop_bdp()
 #upload_uop_spec() 
+
 
