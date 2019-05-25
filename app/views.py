@@ -18,7 +18,8 @@ from flask_appbuilder.models.sqla.interface import SQLAInterface
 #from app.models import Document, Revision, Commentsheet, Comment, Dedoc, Moc,Discipline, Unit, SplitOfWorks, Actionrequired, Issuetype
 from app.models import (Disciplinedras, Mocmodel, Dedocmodel, Unitmodel, 
                         Splitofworks, Drasdocument, Drasrevision, Drasissuetype,
-                        Drasactionrequired, Drascommentsheet, Drascomment)
+                        Drasactionrequired, Drascommentsheet, Drascomment,
+                        Tagdiscipline)
 
 
 #from app import appbuilder, db
@@ -503,6 +504,9 @@ class DrasUploadView(ModelView):
 
         return redirect(url_for('DrasdocumentView.show', pk=doc))
 
+class TagdisciplineView(ModelView):
+    datamodel = SQLAInterface(Tagdiscipline)
+    list_columns = ['name','start','finish']
 
 #appbuilder.add_view(RevisionView,'Revision',icon="fa-folder-open-o", category="DRAS", category_icon='fa-envelope')
 
@@ -533,6 +537,7 @@ appbuilder.add_view(DEDOperatingCenterView, 'DED Operating Centers', icon="fa-fo
 appbuilder.add_view(UnitView, 'Unit',icon="fa-folder-open-o", category="DRAS Components")
 
 appbuilder.add_view(DisciplineView, 'Discipline',icon="fa-folder-open-o", category="DRAS Components")
+appbuilder.add_view(TagdisciplineView, 'Tags',icon="fa-folder-open-o", category="DRAS Components")
 
 
 appbuilder.add_view(SowView, 'Split of Works',icon="fa-folder-open-o", category="DRAS Components")

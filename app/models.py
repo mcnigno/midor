@@ -120,6 +120,17 @@ class Uop_spec(Model):
 
 
 
+class Tagdiscipline(Model,AuditMixin):
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String(100), unique=True, nullable=False)
+    start = Column(Integer, nullable=False)
+    finish = Column(Integer, nullable=False) 
+
+    def __repr__(self):
+        return self.name
+
+
 class Disciplinedras(Model, AuditMixin):
     id = Column(Integer, primary_key=True)
 
@@ -352,6 +363,9 @@ class Drascomment(Model, AuditMixin):
 
     drascommentsheet_id = Column(Integer, ForeignKey('drascommentsheet.id'))
     drascommentsheet = relationship(Drascommentsheet)
+
+    tagdiscipline_id = Column(Integer, ForeignKey('tagdiscipline.id'))
+    tagdiscipline = relationship(Tagdiscipline)
     
     pos = Column(String(5))
     tag = Column(String(20))

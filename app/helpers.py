@@ -162,3 +162,6 @@ def check_extension(document_code, file_dict):
 #upload_uop_spec() 
 
 
+from app.init_helpers import init_dras
+
+#init_dras()

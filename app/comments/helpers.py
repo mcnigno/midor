@@ -1,7 +1,7 @@
 
 from config import UPLOAD_FOLDER
 import openpyxl
-from app.models import Drasdocument, Drasrevision, Drascommentsheet, Drascomment, Splitofworks, Unitmodel, Disciplinedras
+from app.models import Drasdocument, Drasrevision, Drascommentsheet, Drascomment, Splitofworks, Unitmodel, Disciplinedras, Tagdiscipline
 from datetime import datetime
 from flask import flash, abort
 from app import db
@@ -309,15 +309,20 @@ def get_data_from_cs(item):
 
         for cs in commentSheets:
             cs.current = False
-
+    
     try:
         for row in csSheet.iter_rows(min_row=17,min_col=2):
             #print('CommentStatus', row[0].value,row[9].value,row[10].value,row[11].value, type(row[11].value))
-            if row[0].value is not None:
-                #print(row[0].value) 
+            
+            if row[0].value is not None and row[1].value is not None:
+                #print(row[0].value)
+                #  
                 comment = Drascomment(
                     drasrevision_id = rev.id,
                     drascommentsheet = item,
+                    tagdiscipline= session.query(Tagdiscipline).filter(
+                                                Tagdiscipline.start <= int(row[1].value), 
+                                                Tagdiscipline.finish >= int(row[1].value)).first(), 
 
                     pos = row[0].value,
                     tag = row[1].value,

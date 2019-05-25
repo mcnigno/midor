@@ -3,7 +3,7 @@ from app import db
 from app.models import (Mocmodel, Unitmodel, Dedocmodel,
                 Splitofworks, Disciplinedras, Drascommentsheet,
                 Drasissuetype, Drasactionrequired, Drascomment,
-                Drasrevision, Drasdocument)
+                Drasrevision, Drasdocument, Tagdiscipline)
 from app.comments.helpers import get_data_from_cs, get_fake_data_from_cs, get_fake_data_from_cs2
 from config import UPLOAD_FOLDER
 import uuid
@@ -11,9 +11,30 @@ from flask_appbuilder.filemanager import FileManager
 from flask import current_app
 import random
 
-path = 'midor/app/comments/ListeXLSX/OperatingCenter.xlsx'
+path = UPLOAD_FOLDER + 'init/OperatingCenter.xlsx'
 workbook = openpyxl.load_workbook(path)
 worksheet = workbook.active
+
+path = UPLOAD_FOLDER + 'init/DisciplineTag.xlsx'
+wbtag = openpyxl.load_workbook(path)
+wstag = wbtag.active
+
+def add_tags():
+    session = db.session
+    session.query(Tagdiscipline).delete()
+
+    for row in wstag.iter_rows(min_row=2):
+        print(row[0].value,row[1].value)
+        tag = Tagdiscipline(name=row[0].value,
+                            start=row[1].value,
+                            finish=row[2].value,
+                            created_by_fk='1',
+                            changed_by_fk='1')
+        session.add(tag)
+    session.commit()
+
+#add_tags()
+
 
 def add_actionRequired():
     session = db.session
@@ -166,7 +187,7 @@ def splitOfWorks():
 
 def init_dras():
     session = db.session
-
+    
     session.query(Drascomment).delete()
     session.query(Drascommentsheet).delete()
     session.query(Drasrevision).delete()
@@ -210,6 +231,7 @@ def init_dras():
     print('                ok    Init is Done')
   
 
+#init_dras()   
 
 ##
 ##  Test
@@ -424,5 +446,5 @@ def fakeItem3(times):
 #fakeItem3(99)
  
  
-#init_dras()
+
 #fakeItem3(40)
