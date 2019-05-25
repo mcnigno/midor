@@ -33,7 +33,7 @@ def add_tags():
         session.add(tag)
     session.commit()
 
-#add_tags()
+add_tags()
 
 
 def add_actionRequired():
@@ -187,7 +187,7 @@ def splitOfWorks():
 
 def init_dras():
     session = db.session
-    
+
     session.query(Drascomment).delete()
     session.query(Drascommentsheet).delete()
     session.query(Drasrevision).delete()
