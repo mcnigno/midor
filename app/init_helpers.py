@@ -33,7 +33,7 @@ def add_tags():
         session.add(tag)
     session.commit()
 
-add_tags()
+#add_tags()
 
 
 def add_actionRequired():
