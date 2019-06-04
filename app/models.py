@@ -221,8 +221,10 @@ class Drasdocument(Model, AuditMixin):
         session = db.session
         cs = session.query(Drascommentsheet).filter(Drascommentsheet.drasdocument_id == self.id,
                                             Drascommentsheet.current == True).first()
-        return cs.drasrevision
-    
+        if cs:
+            return cs.drasrevision
+        return "Not Found"
+
     def current_stage(self):
         session = db.session
         cs = session.query(Drascommentsheet).filter(Drascommentsheet.drasdocument_id == self.id,
