@@ -229,8 +229,9 @@ class Drasdocument(Model, AuditMixin):
         session = db.session
         cs = session.query(Drascommentsheet).filter(Drascommentsheet.drasdocument_id == self.id,
                                             Drascommentsheet.current == True).first()
-        return cs.stage
-        
+        if cs:
+            return cs.stage
+        return "Stage Not Found"
 class Drasrevision(Model, AuditMixin):
     id = Column(Integer, primary_key=True)
     name = Column(String(5), nullable=False)
