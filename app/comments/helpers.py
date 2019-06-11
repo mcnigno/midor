@@ -135,7 +135,7 @@ def update_data_from_cs(item):
 
         doc = session.query(Drasdocument).filter(Drasdocument.name == document).first()
         session.query(Drascomment).filter(Drascomment.drasdocument_id == doc.id).delete()
-        
+        print('Document',doc.id, doc.name)
         cs_list = session.query(Drascommentsheet).filter( 
                                     Drascommentsheet.drasdocument_id == doc.id,
                                     Drascommentsheet.current == True).all()
