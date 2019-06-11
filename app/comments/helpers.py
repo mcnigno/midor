@@ -142,10 +142,10 @@ def update_data_from_cs(item):
         #item.stage = rev_stage
         for cs in cs_list:  
             cs.current = False
-        print('cs', cs.current, cs.id, 'item',item.current, item.id)
+            print('cs', cs.current, cs.id, 'item',item.current, item.id)
         item.current = True
-        print('cs', cs.current, cs.id, 'item',item.current, item.id)
-
+        
+        print('Item Current', item.current)
         for row in csSheet.iter_rows(min_row=17,min_col=2):
             
             
