@@ -137,7 +137,7 @@ def update_data_from_cs(item):
         session.query(Drascomment).filter(Drascomment.drasdocument_id == doc.id).delete()
         
         cs_list = session.query(Drascommentsheet).filter( 
-                                    Drasdocument.id == doc.id,
+                                    Drascommentsheet.drasdocument_id == doc.id,
                                     Drascommentsheet.current == True).all()
         #item.stage = rev_stage
         for cs in cs_list:  
