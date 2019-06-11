@@ -476,18 +476,19 @@ class DrasUploadView(ModelView):
     
     def pre_add(self, item):
         
-        '''
+        
         # Check File Requirements
         check_labels(item)
         doc = get_data_from_cs(item) 
-
+        '''
         session['last_document'] = doc
         print('PRE ADD FUNCTION ************ ',session['last_document'] )
-
+        '''
+        
         if doc == False:
             return abort(400, 'Pre Add Function Error.')
 
-        '''
+        
 
     def pre_update(self, item):
         session['last_document'] = item.document_id
