@@ -270,6 +270,8 @@ class CommentSheetView(ModelView):
         #return redirect(self.get_redirect())
         return redirect(url_for('DrasdocumentView.show', pk=item.drasdocument_id))
 
+    
+
     def pre_add(self, item):
         
         
@@ -481,10 +483,10 @@ class DrasUploadView(ModelView):
         # Check File Requirements
         check_labels(item)
         doc = get_data_from_cs(item) 
-        '''
+        
         session['last_document'] = doc
         print('PRE ADD FUNCTION ************ ',session['last_document'] )
-        '''
+        
 
         if doc == False:
             return abort(400, 'Pre Add Function Error.')
@@ -492,21 +494,21 @@ class DrasUploadView(ModelView):
         
 
     def pre_update(self, item):
-        session['last_document'] = item.document_id
+        session['last_document'] = item.drasdocument_id
         
         
         # Find or Create Document
         # Find or Create Revision
     
-    '''
+    
     def post_add_redirect(self):
-        Override this function to control the redirect after add endpoint is called.
+        # Override this function to control the redirect after add endpoint is called.
         
         doc = str(session['last_document'])
         print('POST EDIT FUNCTION ************ ',session['last_document'] )
 
         return redirect(url_for('DrasdocumentView.show', pk=doc))
-    ''' 
+     
 
 class TagdisciplineView(ModelView):
     datamodel = SQLAInterface(Tagdiscipline)

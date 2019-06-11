@@ -693,3 +693,18 @@ def find_rev():
     return
 '''
 #find_rev()
+
+def set_current_last_actual_date():
+    session = db.session
+    docs = session.query(Drasdocument).all()
+    for doc in docs:
+        cs = session.query(Drascommentsheet).filter(
+            Drascommentsheet.drasdocument_id == doc.id
+        ).order_by(Drascommentsheet.created_on.desc()).first()
+        print(cs)
+        cs.current = True
+        cs.changed_by_fk = '1'
+        cs.created_by_fk = '1'
+    session.commit()
+ 
+set_current_last_actual_date()   
