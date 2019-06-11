@@ -265,7 +265,7 @@ class CommentSheetView(ModelView):
         item = items
          
         update_data_from_cs(item)
-        
+        print(session)
  
         #return redirect(self.get_redirect())
         return redirect(url_for('DrasdocumentView.show', pk=item.drasdocument_id))
