@@ -484,7 +484,7 @@ class DrasUploadView(ModelView):
         session['last_document'] = doc
         print('PRE ADD FUNCTION ************ ',session['last_document'] )
         '''
-        
+
         if doc == False:
             return abort(400, 'Pre Add Function Error.')
 
@@ -497,14 +497,15 @@ class DrasUploadView(ModelView):
         # Find or Create Document
         # Find or Create Revision
     
+    '''
     def post_add_redirect(self):
-        """Override this function to control the redirect after add endpoint is called.
+        Override this function to control the redirect after add endpoint is called.
         
         doc = str(session['last_document'])
         print('POST EDIT FUNCTION ************ ',session['last_document'] )
 
         return redirect(url_for('DrasdocumentView.show', pk=doc))
-        """
+    ''' 
 
 class TagdisciplineView(ModelView):
     datamodel = SQLAInterface(Tagdiscipline)
