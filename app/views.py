@@ -51,6 +51,13 @@ class MidorewdDashboardView(BaseView):
     def midorewd(self): 
         return self.render_template('midorewd.html')
 
+class MidorDrasDashboardView(BaseView):
+    default_view = 'dash_dras'
+    @expose('/dash_dras', methods=['POST', 'GET'])
+    def dash_dras(self): 
+        return self.render_template('dash_dras.html')
+
+
 class EarlyWorksDocView(ModelView):
     datamodel = SQLAInterface(EarlyWorksDoc)
     list_columns = ['discipline', 'contractor_code', 'revision', 'short_desc','file']
@@ -153,9 +160,11 @@ class SowView(ModelView):
 
 class IssueTypeView(ModelView):
     datamodel = SQLAInterface(Drasissuetype)
+    list_columns = ['name']
 
 class ActionRequiredView(ModelView):
     datamodel = SQLAInterface(Drasactionrequired)
+    list_columns = ['name']
 
 class CommentSheetView(ModelView):
     datamodel = SQLAInterface(Drascommentsheet)
@@ -164,7 +173,7 @@ class CommentSheetView(ModelView):
     list_title = 'List DRAS History'
     show_title = 'Show DRAS'
     add_columns = ['cs_file', 'current'] 
-    list_columns = ['documentReferenceRev','stage_icon','filename', 'is_current', 'download'] 
+    list_columns = ['documentReferenceRev','stage_icon','actualDate','notificationItem', 'is_current', 'download'] 
     label_columns = {
         'documentReferenceDoc':     'Document',
         'documentReferenceRev':     'Revision', 
@@ -529,6 +538,9 @@ def page_not_found(e):
 
 
 appbuilder.add_view(MidorewdDashboardView, "Early Works Documentation", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
+appbuilder.add_view(MidorDrasDashboardView, "DRAS General", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
+
+
 appbuilder.add_view(EarlyWorksDocView, "Engineering Documents", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 appbuilder.add_view(EarlyWorksDocViewRestricted, "Engineering Documents PMC", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 appbuilder.add_view(CorrespondenceView, "Correspondence", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
