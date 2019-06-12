@@ -288,8 +288,8 @@ class CommentSheetView(ModelView):
         check_labels(item)
         doc = get_data_from_cs(item) 
 
-        session['last_document'] = doc
-        print('PRE ADD FUNCTION ************ ',session['last_document'] )
+        #session['last_document'] = doc
+        #print('PRE ADD FUNCTION ************ ',session['last_document'] )
 
         if doc == False:
             return abort(400, 'Pre Add Function Error.')
