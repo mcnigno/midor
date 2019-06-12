@@ -513,7 +513,7 @@ class DrasUploadView(ModelView):
     def post_add_redirect(self):
         # Override this function to control the redirect after add endpoint is called.
         
-        doc = str(session['last_document'])
+        doc = session['last_document']
         print('POST EDIT FUNCTION ************ ',session['last_document'] )
 
         return redirect(url_for('DrasdocumentView.show', pk=doc))
