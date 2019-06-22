@@ -191,8 +191,8 @@ body > div.container > div > div > div:nth-child(3) > div.table-responsive > tab
     
 }
 .dash_iframe {
-    height: 4040px;
-    width:100%;
+    height: 6000px;
+    width:1500px;
     position: relative;
     padding-bottom: 56.25%;
 }

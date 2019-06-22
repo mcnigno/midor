@@ -157,7 +157,7 @@ class SowView(ModelView):
             self.datamodel.delete(items)
         return redirect(self.get_redirect())
 
-
+  
 class IssueTypeView(ModelView):
     datamodel = SQLAInterface(Drasissuetype)
     list_columns = ['name']
@@ -173,7 +173,7 @@ class CommentSheetView(ModelView):
     list_title = 'List DRAS History'
     show_title = 'Show DRAS'
     add_columns = ['cs_file', 'current'] 
-    list_columns = ['documentReferenceRev','stage_icon','actualDate','notificationItem', 'is_current', 'download'] 
+    list_columns = ['documentReferenceRev','stage_icon','actualDate','notificationItem','response_status', 'is_current', 'download'] 
     label_columns = {
         'documentReferenceDoc':     'Document',
         'documentReferenceRev':     'Revision', 
@@ -537,8 +537,8 @@ def page_not_found(e):
     return render_template('404.html', base_template=appbuilder.base_template, appbuilder=appbuilder), 404
 
 
-appbuilder.add_view(MidorewdDashboardView, "Early Works Documentation", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
-appbuilder.add_view(MidorDrasDashboardView, "DRAS General", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
+#appbuilder.add_view(MidorewdDashboardView, "Early Works Documentation", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
+appbuilder.add_view(MidorDrasDashboardView, "Comments", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
 
 
 appbuilder.add_view(EarlyWorksDocView, "Engineering Documents", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
