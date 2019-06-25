@@ -170,6 +170,7 @@ class CommentSheetView(ModelView):
     datamodel = SQLAInterface(Drascommentsheet)
     add_title = 'View DRAS'
     edit_title = 'Edit DRAS'
+    edit_exclude_columns = ['cs_file']
     list_title = 'List DRAS History'
     show_title = 'Show DRAS'
     add_columns = ['cs_file', 'current'] 

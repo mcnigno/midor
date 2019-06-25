@@ -707,4 +707,4 @@ def set_current_last_actual_date():
         cs.created_by_fk = '1'
     session.commit()
  
-set_current_last_actual_date()   
+#set_current_last_actual_date()   
