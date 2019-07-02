@@ -568,35 +568,23 @@ appbuilder.add_view(TagdisciplineView, 'Tags',icon="fa-folder-open-o", category=
 
 appbuilder.add_view(SowView, 'Split of Works',icon="fa-folder-open-o", category="DRAS Components")
 
-appbuilder.add_view(DrasdocumentView, 'Document', icon="fa-folder-open-o",category="DRAS", category_icon='fa-envelope')
-
-
-
-
-
-
-
-
-
-
-
-
+appbuilder.add_view(DrasdocumentView, 'Document', icon="fa-folder-open-o",category="DRAS DCC", category_icon='fa-envelope')
 
 
 appbuilder.add_view(RevisionView, 'Revision',
-                    icon="fa-folder-open-o", category="DRAS")
+                    icon="fa-folder-open-o", category="DRAS DCC")
 
 appbuilder.add_view(CommentSheetView, 'Dras List',
-                    icon="fa-folder-open-o", category="DRAS")
+                    icon="fa-folder-open-o", category="DRAS DCC")
 
 appbuilder.add_view(CommentView, 'Comment',
-                    icon="fa-folder-open-o", category="DRAS")
+                    icon="fa-folder-open-o", category="DRAS DCC")
 
  
-appbuilder.add_separator(category="DRAS")
+appbuilder.add_separator(category="DRAS DCC")
 
 appbuilder.add_view(DrasUploadView, 'Dras Upload',
-                    icon="fa-folder-open-o", category="DRAS")
+                    icon="fa-folder-open-o", category="DRAS DCC")
 
 
 
