@@ -57,6 +57,12 @@ class MidorDrasDashboardView(BaseView):
     def dash_dras(self): 
         return self.render_template('dash_dras.html')
 
+class MidorDras2DashboardView(BaseView):
+    default_view = 'dash_dras'
+    @expose('/dash_dras', methods=['POST', 'GET'])
+    def dash_dras(self): 
+        return self.render_template('dash_dras2.html')
+
 
 class EarlyWorksDocView(ModelView):
     datamodel = SQLAInterface(EarlyWorksDoc)
@@ -540,6 +546,7 @@ def page_not_found(e):
 
 #appbuilder.add_view(MidorewdDashboardView, "Early Works Documentation", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
 appbuilder.add_view(MidorDrasDashboardView, "Comments", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
+appbuilder.add_view(MidorDras2DashboardView, "DRAS", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
 
 
 appbuilder.add_view(EarlyWorksDocView, "Engineering Documents", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
