@@ -7,7 +7,6 @@ from .models import EarlyWorksDoc, Correspondence, Uop_Bpd, Uop_spec
 from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual, FilterNotContains
 
 
-
 """
     DRASS Comments View Section
 """
@@ -96,10 +95,6 @@ class Uop_SpecView(ModelView):
     list_columns = ['document_code', 'revision', 'doc_description', 'file']
     list_template = 'listUop_spec.html' 
 
-
-
-
-
 class UnitView(ModelView):
     datamodel = SQLAInterface(Unitmodel)
     #related_views = [CommentSheetView, RevisionView, CommentView]
@@ -185,7 +180,7 @@ class CommentSheetView(ModelView):
         'documentReferenceDoc':     'Document',
         'documentReferenceRev':     'Revision', 
         'documentReferenceDesc':    'Description',
-        'documentReferenceBy':      'By',
+        'documentReferenceBy':      'Discipline',
 
         'ownerTransmittalReference':'ID', 
         'ownerTransmittalDate':     'Date', 
@@ -206,10 +201,11 @@ class CommentSheetView(ModelView):
         'drasdocument':             'Document',
         'drasrevision':             'Revision'
     }
+    
     show_fieldsets = [
         (lazy_gettext('DRAS Info'),
 
-         {'fields': ['id', 'drasdocument', 'drasrevision', 'stage_icon']}),
+         {'fields': ['drasdocument', 'drasrevision', 'stage_icon']}),
         
         (lazy_gettext('Document Reference'),
 
@@ -221,15 +217,52 @@ class CommentSheetView(ModelView):
         
         (lazy_gettext('Owner Transmittal Reference'),
 
-         {'fields': ['ownerTransmittalReference', 
-                    'ownerTransmittalDate', 
+         {'fields': [ 
                     'response_status'], 
                     'expanded': True}),
         
         (lazy_gettext('Contractor Trasmittal Reference'), 
 
-         {'fields': ['contractorTransmittalReference', 
-                    'contractorTransmittalDate', 
+         {'fields': [ 
+                    'contractorTransmittalMr',
+                    'contractorTransmittalVendor',
+                    'actionrequired'], 
+                    'expanded': True}),
+        
+        (lazy_gettext('DRAS Notification'),
+
+         {'fields': ['notificationItem',
+                    'actualDate', 
+                    'expectedDate'], 'expanded': True}),
+        
+        (lazy_gettext('DRAS Internal Info'),
+
+         {'fields': ['note'], 
+                    'expanded': False}),
+    ]
+
+    edit_fieldsets = [
+        (lazy_gettext('DRAS Info'),
+
+         {'fields': ['drasdocument', 'drasrevision']}),
+        
+        (lazy_gettext('Document Reference'),
+
+         {'fields': ['documentReferenceDoc', 
+                    'documentReferenceRev', 
+                    'documentReferenceDesc',
+                    'documentReferenceBy',
+                    'issuetype'], 'expanded': True}),
+        
+        (lazy_gettext('Owner Transmittal Reference'),
+
+         {'fields': [ 
+                    'response_status'], 
+                    'expanded': True}),
+        
+        (lazy_gettext('Contractor Trasmittal Reference'), 
+
+         {'fields': [ 
                     'contractorTransmittalMr',
                     'contractorTransmittalVendor',
                     'actionrequired'], 
@@ -533,9 +566,6 @@ class TagdisciplineView(ModelView):
 #appbuilder.add_view(RevisionView,'Revision',icon="fa-folder-open-o", category="DRAS", category_icon='fa-envelope')
 
 
-
-
-
 """    
     Application wide 404 error handler
 """
@@ -547,7 +577,6 @@ def page_not_found(e):
 #appbuilder.add_view(MidorewdDashboardView, "Early Works Documentation", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
 appbuilder.add_view(MidorDrasDashboardView, "Comments", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
 appbuilder.add_view(MidorDras2DashboardView, "DRAS", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
-
 
 appbuilder.add_view(EarlyWorksDocView, "Engineering Documents", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
 appbuilder.add_view(EarlyWorksDocViewRestricted, "Engineering Documents PMC", icon="fa-folder-open-o", category="Early Works", category_icon='fa-envelope')
