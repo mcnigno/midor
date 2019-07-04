@@ -230,8 +230,14 @@ def get_data_from_cs(item):
     try:
         document = item.cs_file.split('_sep_DRAS_')[1].split('_')[0]
         full_revision = item.cs_file.split('_sep_DRAS_')[1].split('_')[1].split('.')[0]
-        revision = full_revision[:full_revision.index('Y')]
-        rev_stage = full_revision[full_revision.index('Y'):]
+        print('Heeeeeeeeeeeere ********************' )
+        
+        try:
+            revision = full_revision[:full_revision.index('S')]
+            rev_stage = full_revision[full_revision.index('S'):]
+        except:
+            revision = full_revision[:full_revision.index('Y')]
+            rev_stage = full_revision[full_revision.index('Y'):]
 
         oc_unit = document.split('-')[1]
         project = document.split('-')[0] 
@@ -267,7 +273,7 @@ def get_data_from_cs(item):
         
     rev.stage = rev_stage
     
-    
+     
     session.flush()
     
 

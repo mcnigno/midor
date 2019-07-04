@@ -347,7 +347,9 @@ class Drascommentsheet(Model, AuditMixin):
             return Markup('<i class="fa fa-arrow-circle-left" aria-hidden="true"></i>'+'<span>'+ self.stage + '</span>')
         if self.stage == 'YF':
             return Markup('<i class="fa fa-check-circle" aria-hidden="true"></i> '+'<span>' + self.stage + '</span>')
-        
+        if self.stage == 'S':
+            return Markup('<i class="fa fa-arrow-circle-right" aria-hidden="true"></i>'+'<span>'+ self.stage + '</span>')
+
         return Markup('<i class="fa fa-arrow-circle-right" aria-hidden="true"></i>'+'<span>'+ self.stage + '</span>')
     
     def is_current(self):
