@@ -215,7 +215,7 @@ class CommentSheetView(ModelView):
                     'documentReferenceBy',
                     'issuetype'], 'expanded': True}),
         
-        (lazy_gettext('Owner Transmittal Reference'),
+        (lazy_gettext('Owner Status'),
 
          {'fields': [ 
                     'response_status'], 
@@ -223,7 +223,9 @@ class CommentSheetView(ModelView):
         
         (lazy_gettext('Contractor Trasmittal Reference'), 
 
-         {'fields': [ 
+         {'fields': [
+                    'contractorTransmittalDate',
+                    'contractorTransmittalReference', 
                     'contractorTransmittalMr',
                     'contractorTransmittalVendor',
                     'actionrequired'], 
@@ -457,7 +459,7 @@ class DrasdocumentView(ModelView):
     show_template = 'appbuilder/general/model/show_cascade.html'
 
     list_columns = ['name','moc','dedoc', 'open_comm' ] 
-    show_columns = ['title_name','moc','dedoc','current_rev','current_stage']
+    show_columns = ['title_name','description', 'moc','dedoc','current_rev','current_stage']
     show_title = 'Show Document'
     list_title = 'List Document'
     add_title = 'Add Document'
@@ -470,7 +472,8 @@ class DrasdocumentView(ModelView):
         'dedoc':'DED Operating Center',
         'title_name': 'Document',
         'current_rev': 'Current Rev',
-        'current_stage': 'Stage'
+        'current_stage': 'Stage',
+        'description' : 'Title' 
 
          
     }

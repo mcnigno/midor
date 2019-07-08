@@ -224,6 +224,14 @@ class Drasdocument(Model, AuditMixin):
         if cs:
             return cs.drasrevision
         return "Not Found"
+    
+    def description(self):
+        session = db.session
+        cs = session.query(Drascommentsheet).filter(Drascommentsheet.drasdocument_id == self.id,
+                                            Drascommentsheet.current == True).first()
+        if cs:
+            return cs.documentReferenceDesc
+        return "Not Found"
 
     def current_stage(self):
         session = db.session
