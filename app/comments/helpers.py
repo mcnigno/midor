@@ -6,6 +6,7 @@ from datetime import datetime
 from flask import flash, abort
 from app import db
 from random import randint
+from datetime import timedelta
 
 
 def date_parse(field):
@@ -37,9 +38,9 @@ def check_labels(item):
         'Material requisition': csSheet['G10'].value,
         'Vendor Name' : csSheet['G11'].value,
 
-        'Rev.' : csSheet['J9'].value,
-        'Description': csSheet['J10'].value,
-        'Issued by (Contractor Discipline)': csSheet['J11'].value
+        'Rev.' : csSheet['K9'].value,
+        'Description': csSheet['K10'].value,
+        'Issued by (Contractor Discipline)': csSheet['K11'].value
     }
 
     for key, value in header_labels_dict.items():
@@ -53,7 +54,7 @@ def check_labels(item):
         
         'Status' : csSheet['G16'].value,
 
-        'Date' : csSheet['K15'].value,
+        'Date' : csSheet['L15'].value,
 
     }
 
@@ -250,7 +251,7 @@ def get_data_from_cs(item):
     if doc is None:
         #fake Discipline
         
-        discipline = csSheet['K11'].value
+        discipline = csSheet['L11'].value
 
         print('DOC is NONE *-----------           ************')
         moc, dedoc = get_oc(oc_unit, discipline)
@@ -293,15 +294,21 @@ def get_data_from_cs(item):
     item.contractorTransmittalMr = csSheet['H10'].value
     item.contractorTransmittalVendor = csSheet['H11'].value
 
-    item.documentReferenceDoc = csSheet['K8'].value
-    item.documentReferenceRev = csSheet['K9'].value
-    item.documentReferenceDesc = csSheet['K10'].value
+    item.documentReferenceDoc = csSheet['L8'].value
+    item.documentReferenceRev = csSheet['L9'].value
+    item.documentReferenceDesc = csSheet['L10'].value
     
     # Discipline
-    item.documentReferenceBy = csSheet['K11'].value
+    item.documentReferenceBy = csSheet['L11'].value
 
     #item.documentReferenceBy = fdiscipline
-    
+    indoor = ['Y','Y2']
+    outdoor = ['S','Y1','Y3']
+
+    if rev_stage in indoor: 
+        item.expectedDate = item.actualDate + timedelta(days=7)
+    if rev_stage in outdoor:
+        item.expectedDate = item.actualDate + timedelta(days=14)
     
     '''
     BODY - CREATE NEW COMMENTS FOR THIS CS
@@ -341,14 +348,14 @@ def get_data_from_cs(item):
                     contractorReplyStatus = row[5].value,
                     contractorReplyComment = row[6].value,
                     
-                    ownerCounterReplyDate = date_parse(csSheet['J15'].value),
-                    ownerCounterReplyComment = row[7].value,
+                    ownerCounterReplyDate = date_parse(csSheet['K15'].value),
+                    ownerCounterReplyComment = row[8].value,
 
-                    finalAgreementDate = date_parse(csSheet['L15'].value),
-                    finalAgreemntCommentDate = date_parse(row[9].value),
-                    finalAgreementComment = row[10].value,
+                    finalAgreementDate = date_parse(csSheet['M15'].value),
+                    finalAgreemntCommentDate = date_parse(row[10].value),
+                    finalAgreementComment = row[11].value,
 
-                    commentStatus = str(row[11].value),
+                    commentStatus = str(row[12].value),
                 )
                 if item.current:  
                     
@@ -714,3 +721,34 @@ def set_current_last_actual_date():
     session.commit()
  
 #set_current_last_actual_date()   
+import os
+from random import choice, randrange
+from time import sleep
+
+def batch_upload():
+    users = [1,2,3]
+    batch_folder = 'drasbatch_test'
+    path = UPLOAD_FOLDER + batch_folder
+
+    files = []
+    # r=root, d=directories, f = files
+    for r, d, f in os.walk(path):
+        for file in f:
+            if '.xlsx' in file:
+                files.append(os.path.join(r, file))
+
+    '''
+    for f in files:
+        issue_type, action, not_item, actual_date = cs_data_report(f)
+        user = choice(users)
+        drascs = Drascommentsheet(
+            created_by_fk = user,
+            changed_by_fk = user,
+            cs_file = f,
+            issuetype = issue_type,
+            actionrequired = action,
+            actualDate = actual_date,
+            notificationItem = not_item
+        )
+'''
+#batch_upload()
