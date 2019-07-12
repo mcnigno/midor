@@ -964,4 +964,4 @@ def batch_upload():
     print('***********BAD FILES LIST',len(bad_file))
     print(bad_file)
 
-#batch_upload()  
+batch_upload()  
