@@ -990,3 +990,74 @@ def batch_upload():
     print(bad_file)
 
 #batch_upload()  
+
+def update_discipline():
+    session = db.session
+    users = [1,2,3]
+    batch_folder = 'init/dras_s'
+    #batch_folder = 'settimo_batch'
+    path = UPLOAD_FOLDER + batch_folder
+
+    files = []
+    # r=root, d=directories, f = files
+    for r, d, f in os.walk(path):
+        for file in f:
+            if '.xlsx' in file:
+                files.append(os.path.join(r, file))
+
+    bad_file = []
+    for f in files:
+        try:
+        
+            print(f)
+            
+            '''
+            issue_type, action, not_item, actual_date = cs_data_report(f)
+        
+            print(issue_type, action, not_item, actual_date)
+            print(' BEFORE LABELS ********************' )
+            check_labels2(f)
+            print(' LABELS ********************' )
+            '''
+            csFile = openpyxl.load_workbook(f)
+            csSheet = csFile.active
+
+            discipline = csSheet['K11'].value
+            description = csSheet['K10'].value
+            cs_rev = csSheet['K9'].value
+            cs_doc = csSheet['K8'].value
+            
+
+            full_file = f.split('/')[-1]
+            document = full_file.split('_')[1]
+            revision = full_file.split('_')[2].split('.')[0]
+            stage = 'S'
+
+            print(document, revision)
+
+            doc = session.query(Drasdocument).filter(Drasdocument.name == document).first()
+            print('DOC ID', doc.id)
+            rev = session.query(Drasrevision).filter(Drasrevision.drasdocument_id == doc.id,
+                                Drasrevision.name == revision).first()
+            
+            print('FOUND +++++ =',doc.name, rev.name)
+            cs = session.query(Drascommentsheet).filter(
+                Drascommentsheet.drasdocument_id == doc.id,
+                Drascommentsheet.drasrevision_id == rev.id,
+                Drascommentsheet.stage == stage
+            )
+            cs.documentReferenceBy = discipline
+            cs.documentReferenceDesc = description
+            cs.documentReferenceRev = cs_rev
+            cs.documentReferenceDoc = cs_doc
+
+            cs.changed_by_fk = '1'
+        except:
+            print('Something Wrong')
+        
+    
+    session.commit()
+
+update_discipline() 
+
+
