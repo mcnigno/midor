@@ -710,33 +710,37 @@ def find_rev():
 def set_current_last_actual_date():
     session = db.session
     docs = session.query(Drasdocument).all()
+    bad_file = []
+    
     for doc in docs:
-        cs_list = session.query(Drascommentsheet).filter(
-            Drascommentsheet.drasdocument_id == doc.id
-        ).all()
-        print(cs_list)
-        for c in cs_list:
-            print(c.id)
-            c.changed_by_fk = '1'
-            c.created_by_fk = '1'
-            c.current = False
-        session.commit()    
+        try:
+            cs_list = session.query(Drascommentsheet).filter(
+                Drascommentsheet.drasdocument_id == doc.id
+            ).all()
+            print(cs_list)
+            for c in cs_list:
+                print(c.id)
+                c.changed_by_fk = '1'
+                c.created_by_fk = '1'
+                c.current = False
+            session.commit()    
+                
             
-        
-        cs = session.query(Drascommentsheet).filter(
-            Drascommentsheet.drasdocument_id == doc.id
-        ).order_by(Drascommentsheet.actualDate.desc()).first()
-        print(doc,cs.id)
-        cs.current = True
-        cs.changed_by_fk = '1'
-        cs.created_by_fk = '1'
-        
-        
+            cs = session.query(Drascommentsheet).filter(
+                Drascommentsheet.drasdocument_id == doc.id
+            ).order_by(Drascommentsheet.actualDate.desc()).first()
+            print(doc,cs.id)
+            cs.current = True
+            cs.changed_by_fk = '1'
+            cs.created_by_fk = '1'
+        except:
+            bad_file.append(cs)      
+            
     session.commit()
 
 set_current_last_actual_date() 
-# 
-#  
+    # 
+    #  
 def set_expected_date():
     session = db.session
     cs_list = session.query(Drascommentsheet).all()
@@ -750,7 +754,9 @@ def set_expected_date():
             elif cs.stage in outdoor:
                 cs.expectedDate = cs.actualDate + timedelta(days=15)
         cs.changed_by_fk = '1'
-        cs.created_by_fk = '1'   
+        cs.created_by_fk = '1'
+        
+           
     session.commit()
 
 #set_expected_date() 
