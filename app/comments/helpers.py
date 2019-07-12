@@ -763,7 +763,7 @@ def set_expected_date():
            
     session.commit()
 
-set_expected_date() 
+#set_expected_date() 
         
 
 
