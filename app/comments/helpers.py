@@ -738,7 +738,7 @@ def set_current_last_actual_date():
             
     session.commit()
 
-set_current_last_actual_date() 
+#set_current_last_actual_date() 
     # 
     #  
 def set_expected_date():
@@ -747,19 +747,23 @@ def set_expected_date():
     indoor = ['Y','Y2']
     outdoor = ['Y1', 'Y3','S']
     for cs in cs_list:
-        print(cs.id)
-        if cs.actualDate:
-            if cs.stage in indoor:
-                cs.expectedDate = cs.actualDate + timedelta(days=7)
-            elif cs.stage in outdoor:
-                cs.expectedDate = cs.actualDate + timedelta(days=15)
-        cs.changed_by_fk = '1'
-        cs.created_by_fk = '1'
+        try:
+
+            print(cs.id)
+            if cs.actualDate:
+                if cs.stage in indoor:
+                    cs.expectedDate = cs.actualDate + timedelta(days=7)
+                elif cs.stage in outdoor:
+                    cs.expectedDate = cs.actualDate + timedelta(days=15)
+            cs.changed_by_fk = '1'
+            cs.created_by_fk = '1'
+        except:
+            print('SOMETHING WRONG')
         
            
     session.commit()
 
-#set_expected_date() 
+set_expected_date() 
         
 
 
