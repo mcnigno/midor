@@ -713,21 +713,130 @@ def set_current_last_actual_date():
     for doc in docs:
         cs = session.query(Drascommentsheet).filter(
             Drascommentsheet.drasdocument_id == doc.id
-        ).order_by(Drascommentsheet.created_on.desc()).first()
+        ).order_by(Drascommentsheet.actualDate.desc()).first()
         print(cs)
         cs.current = True
         cs.changed_by_fk = '1'
         cs.created_by_fk = '1'
     session.commit()
  
-#set_current_last_actual_date()   
+#set_current_last_actual_date()
+# 
+#  
+def set_expected_date():
+    session = db.session
+    cs_list = session.query(Drascommentsheet).all()
+    indoor = ['Y','Y2']
+    outdoor = ['Y1', 'Y3']
+    for cs in cs_list:
+        if cs.actualDate:
+            if cs.stage in indoor:
+                cs.expectedDate = cs.actualDate + timedelta(days=7)
+            elif cs.stage in outdoor:
+                cs.expectedDate = cs.actualDate + timedelta(days=15)
+        cs.changed_by_fk = '1'
+        cs.created_by_fk = '1'   
+    session.commit()
+
+#set_expected_date() 
+        
+
+
+
 import os
 from random import choice, randrange
 from time import sleep
+def check_labels2(item):
+    # 
+    # Check File Labels
+    # 
+    #  
+    #item = item.cs_file
+    csFile = openpyxl.load_workbook(item)
+    csSheet = csFile.active
+    
+    # Duplicate key (label in excel) for check purpose
+    header_labels_dict = {
+        'Reference' : csSheet['C8'].value,
+        'Date' : csSheet['D8'].value,
+
+        'Reference' : csSheet['G8'].value,
+        'Date' : csSheet['G9'].value,
+        'Material requisition': csSheet['G10'].value,
+        'Vendor Name' : csSheet['G11'].value,
+
+        'Rev.' : csSheet['K9'].value,
+        'Description': csSheet['K10'].value,
+        'Issued by (Contractor Discipline)': csSheet['K11'].value
+    }
+
+    for key, value in header_labels_dict.items():
+        #print(key, value)
+        if key != value:
+            #flash(('Header Label ' + key + ' Not Found, Check your DRAS Template!'), category='warning')
+            abort(400,('Header Label ' + key + ' Not Found, Check your DRAS Template!'))
+    
+    table_label_dict = {
+        'Pos.' : csSheet['B14'].value,
+        
+        'Status' : csSheet['G16'].value,
+
+        'Date' : csSheet['L15'].value,
+
+    }
+
+    for key, value in table_label_dict.items():
+        #print(key, value)
+        if key != value:
+            flash(('Table Label ' + key + ' Not Found, Check your DRAS Template!'), category='warning')
+            print(('Table Label ' + key + ' Not Found, Check your DRAS Template!'))
+            return False
+    
+    print('-------------------- CHECK FUNCTION TRUE')
+    return True
+
+def cs_data_report(dras_file):
+        
+    print(dras_file)
+    cs_file = dras_file.split('/')[-1]
+    print(cs_file)
+    try:
+        print('BEFORE ********************' )
+        document = cs_file.split('DRAS_')[1].split('_')[0]
+        
+
+        full_revision = cs_file.split('DRAS_')[1].split('_')[1].split('.')[0]
+        
+        
+        try:
+            revision = full_revision[:full_revision.index('S')]
+            rev_stage = full_revision[full_revision.index('S'):]
+        except:
+            
+            revision = full_revision[:full_revision.index('Y')]
+            rev_stage = full_revision[full_revision.index('Y'):]
+        
+        oc_unit = document.split('-')[1]
+        project = document.split('-')[0]
+        print(document,revision,rev_stage,oc_unit,project)
+
+    except:
+        abort(400, 'Error in file name. Check Your File!')
+
+
+    
+    issue_type = 'it'
+    action = 'ac'
+    not_item = 'ni'
+    actual_date = 'ad'
+    
+    return issue_type, action, not_item, actual_date
 
 def batch_upload():
+    session = db.session
     users = [1,2,3]
-    batch_folder = 'drasbatch_test'
+    batch_folder = 'init/dras_s'
+    #batch_folder = 'settimo_batch'
     path = UPLOAD_FOLDER + batch_folder
 
     files = []
@@ -737,18 +846,122 @@ def batch_upload():
             if '.xlsx' in file:
                 files.append(os.path.join(r, file))
 
-    '''
+    bad_file = []
     for f in files:
-        issue_type, action, not_item, actual_date = cs_data_report(f)
-        user = choice(users)
-        drascs = Drascommentsheet(
-            created_by_fk = user,
-            changed_by_fk = user,
-            cs_file = f,
-            issuetype = issue_type,
-            actionrequired = action,
-            actualDate = actual_date,
-            notificationItem = not_item
-        )
-'''
-#batch_upload()
+        try:
+            print(f)
+            
+            '''
+            issue_type, action, not_item, actual_date = cs_data_report(f)
+        
+            print(issue_type, action, not_item, actual_date)
+            print(' BEFORE LABELS ********************' )
+            check_labels2(f)
+            print(' LABELS ********************' )
+            '''
+            csFile = openpyxl.load_workbook(f)
+            csSheet = csFile.active
+
+            notification_item = csSheet['H8'].value
+            actual_date = csSheet['H9'].value
+
+            full_file = f.split('/')[-1]
+            document = full_file.split('_')[1]
+            revision = full_file.split('_')[2].split('.')[0]
+
+            print(document, revision)
+            oc_unit = document.split('-')[1]
+            project = document.split('-')[0]
+
+            rev_stage = 'S'
+            doc = session.query(Drasdocument).filter(Drasdocument.name == document).first()
+
+            if doc is None:
+                #fake Discipline
+                
+                discipline = csSheet['L11'].value
+
+                print('DOC is NONE *-----------           ************')
+                moc, dedoc = get_oc(oc_unit, discipline)
+                print('MOC - DEDOC ', moc, dedoc)
+                doc = Drasdocument(name=document, moc_id=moc, dedoc_id=dedoc)
+                doc.created_by_fk = '1'
+                doc.changed_by_fk = '1'
+                print('DOC           ************')
+                session.add(doc)
+                print('DOC  ADD         ************')
+                session.flush()
+                print('DOC  FLUSH         ************')
+                print('Document',doc.name)
+                print(revision, doc.id)
+            # session flush for doc id
+            session.flush()
+            print('AFTER FLUSH')
+            print(revision, doc.id)
+            # search the same rev for this document by doc id
+            
+            print('BLOCKED HERE ------------------ //////////////////////')
+            rev = session.query(Drasrevision).filter(Drasrevision.name == revision, Drasrevision.drasdocument_id == doc.id).first() 
+            print('searching for revision, document:', revision, document)
+            print('found', rev)
+            if rev is None:
+                print(rev)
+                print('    ----------     Rev is None: ', revision, rev_stage, document)
+                rev = Drasrevision(name=revision, drasdocument=doc, changed_by_fk='1',created_by_fk = '1')
+                
+                session.add(rev)
+                #session.flush()
+            
+            rev.changed_by_fk = '1'
+            rev.stage = rev_stage
+            #rev.created_by_fk = '1'
+            
+            
+            
+            session.flush()
+            
+
+            '''
+                HEADER - UPDATE THE COMMENT SHEET
+            '''
+
+                
+
+            '''
+            except:
+                print('FAILED XXXXXXXXXXXXXXXXXXXXXXXXXX ',f)
+                bad_file.append(f)
+            '''
+
+            #issue_type, action, not_item, actual_date = cs_data_report(f)
+            user = choice(users)
+            if isinstance(actual_date,str):
+                try:
+                    actual_date = datetime.strptime(actual_date,'%d/%m/%Y')
+                except:
+                    print('FAILED######################### ',f)
+                    bad_file.append(f)
+            
+            drascs = Drascommentsheet(
+                created_by_fk = user,
+                changed_by_fk = user,
+                cs_file = f,
+                #issuetype = issue_type,
+                #actionrequired = action,
+                actualDate = actual_date,
+                #actualDate = actual_date,
+                notificationItem = notification_item,
+                stage = 'S'
+            )
+            drascs.drasrevision_id = rev.id
+            drascs.drasdocument_id = doc.id
+            drascs.created_by_fk = '1'
+            drascs.changed_by_fk = '1'
+            session.add(drascs)
+        except:
+            bad_file.append(f)
+    session.commit()
+    print('***********BAD FILES LIST',len(bad_file))
+    print(bad_file)
+
+#batch_upload()  
