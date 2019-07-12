@@ -1022,10 +1022,10 @@ def update_discipline():
             csFile = openpyxl.load_workbook(f)
             csSheet = csFile.active
 
-            discipline = csSheet['K11'].value
-            description = csSheet['K10'].value
-            cs_rev = csSheet['K9'].value
-            cs_doc = csSheet['K8'].value
+            discipline = csSheet['L11'].value
+            description = csSheet['L10'].value
+            cs_rev = csSheet['L9'].value
+            cs_doc = csSheet['L8'].value
             
 
             full_file = f.split('/')[-1]
@@ -1045,13 +1045,14 @@ def update_discipline():
                 Drascommentsheet.drasdocument_id == doc.id,
                 Drascommentsheet.drasrevision_id == rev.id,
                 Drascommentsheet.stage == stage
-            )
+            ).first()
             cs.documentReferenceBy = discipline
             cs.documentReferenceDesc = description
             cs.documentReferenceRev = cs_rev
             cs.documentReferenceDoc = cs_doc
 
             cs.changed_by_fk = '1'
+            print(cs.id,cs.documentReferenceBy,cs.documentReferenceDoc,cs.documentReferenceRev)
         except:
             print('Something Wrong')
         
