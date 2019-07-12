@@ -711,24 +711,39 @@ def set_current_last_actual_date():
     session = db.session
     docs = session.query(Drasdocument).all()
     for doc in docs:
+        cs_list = session.query(Drascommentsheet).filter(
+            Drascommentsheet.drasdocument_id == doc.id
+        ).all()
+        print(cs_list)
+        for c in cs_list:
+            print(c.id)
+            c.changed_by_fk = '1'
+            c.created_by_fk = '1'
+            c.current = False
+        session.commit()    
+            
+        
         cs = session.query(Drascommentsheet).filter(
             Drascommentsheet.drasdocument_id == doc.id
         ).order_by(Drascommentsheet.actualDate.desc()).first()
-        print(cs)
+        print(doc,cs.id)
         cs.current = True
         cs.changed_by_fk = '1'
         cs.created_by_fk = '1'
+        
+        
     session.commit()
- 
-#set_current_last_actual_date()
+
+set_current_last_actual_date() 
 # 
 #  
 def set_expected_date():
     session = db.session
     cs_list = session.query(Drascommentsheet).all()
     indoor = ['Y','Y2']
-    outdoor = ['Y1', 'Y3']
+    outdoor = ['Y1', 'Y3','S']
     for cs in cs_list:
+        print(cs.id)
         if cs.actualDate:
             if cs.stage in indoor:
                 cs.expectedDate = cs.actualDate + timedelta(days=7)
@@ -964,4 +979,4 @@ def batch_upload():
     print('***********BAD FILES LIST',len(bad_file))
     print(bad_file)
 
-batch_upload()  
+#batch_upload()  

@@ -175,7 +175,7 @@ class CommentSheetView(ModelView):
     list_title = 'List DRAS History'
     show_title = 'Show DRAS' 
     add_columns = ['cs_file', 'current'] 
-    list_columns = ['documentReferenceRev','stage_icon','actualDate','expectedDate','notificationItem','response_status', 'is_current', 'download'] 
+    list_columns = ['drasrevision','stage_icon','actualDate','expectedDate','notificationItem','response_status', 'is_current', 'download'] 
     label_columns = {
         'documentReferenceDoc':     'Document',
         'documentReferenceRev':     'Revision', 

@@ -342,7 +342,7 @@ class Drascommentsheet(Model, AuditMixin):
 
 
     def __repr__(self):
-        return self.filename()
+        return str(self.id)
     
     def filename(self):
         return get_file_original_name(self.cs_file)
