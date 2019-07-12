@@ -1007,8 +1007,8 @@ def update_discipline():
 
     bad_file = []
     for f in files:
-        try:
         
+        try:
             print(f)
             
             '''
@@ -1046,18 +1046,20 @@ def update_discipline():
                 Drascommentsheet.drasrevision_id == rev.id,
                 Drascommentsheet.stage == stage
             ).first()
-            cs.documentReferenceBy = discipline
+            cs.documentReferenceBy = discipline[:49]
             cs.documentReferenceDesc = description
             cs.documentReferenceRev = cs_rev
             cs.documentReferenceDoc = cs_doc
 
             cs.changed_by_fk = '1'
             print(cs.id,cs.documentReferenceBy,cs.documentReferenceDoc,cs.documentReferenceRev)
+            session.commit()
         except:
             print('Something Wrong')
         
+        
     
-    session.commit()
+    
 
 update_discipline() 
 
