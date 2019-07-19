@@ -539,8 +539,9 @@ class DrasUploadView(ModelView):
         check_labels(item)
         doc = get_data_from_cs(item) 
         
-        session['last_document'] = doc
-        print('PRE ADD FUNCTION ************ ',session['last_document'] )
+        if session['last_document']:
+            session['last_document'] = doc
+            print('PRE ADD FUNCTION ************ ',session['last_document'] )
         
 
         if doc == False:
@@ -549,7 +550,8 @@ class DrasUploadView(ModelView):
         
 
     def pre_update(self, item):
-        session['last_document'] = item.drasdocument_id
+        if session['last_document']:
+            session['last_document'] = item.drasdocument_id
         
         
         # Find or Create Document
@@ -558,11 +560,11 @@ class DrasUploadView(ModelView):
     
     def post_add_redirect(self):
         # Override this function to control the redirect after add endpoint is called.
-        
-        doc = session['last_document']
-        #print('POST EDIT FUNCTION ************ ',session['last_document'] )
+        if session['last_document']:
+            doc = session['last_document']
+            #print('POST EDIT FUNCTION ************ ',session['last_document'] )
 
-        return redirect(url_for('DrasdocumentView.show', pk=doc))
+            return redirect(url_for('DrasdocumentView.show', pk=doc))
     
 
 class TagdisciplineView(ModelView):
