@@ -568,6 +568,7 @@ class DrasUploadView(ModelView):
                 return redirect(url_for('DrasdocumentView.show', pk=doc))
         except:
             print('Something still does not work for session')
+            return redirect(self.get_redirect())
 
 class TagdisciplineView(ModelView):
     datamodel = SQLAInterface(Tagdiscipline)
