@@ -262,7 +262,7 @@ def get_data_from_cs(item):
 
     # session flush for doc id
     # search the same rev for this document by doc id
-    print('BLOCKED HERE ------------------ //////////////////////')
+    
     rev = session.query(Drasrevision).filter(Drasrevision.name == revision, Drasrevision.drasdocument_id == doc.id).first() 
     print('searching for revision, document:', revision, document)
     print('found', rev)
@@ -276,7 +276,6 @@ def get_data_from_cs(item):
     
      
     session.flush()
-    
 
     '''
         HEADER - UPDATE THE COMMENT SHEET
@@ -323,12 +322,13 @@ def get_data_from_cs(item):
         for cs in commentSheets:
             cs.current = False
     
+
     try:
         for row in csSheet.iter_rows(min_row=17,min_col=2):
-            #print('CommentStatus', row[0].value,row[9].value,row[10].value,row[11].value, type(row[11].value))
+            print('CommentStatus', row[0].value,row[9].value,row[10].value,row[11].value, type(row[11].value))
             
             if row[0].value is not None and row[1].value is not None:
-                #print(row[0].value)
+                print(row[0].value)
                 #  
                 comment = Drascomment(
                     drasrevision_id = rev.id,
@@ -357,7 +357,10 @@ def get_data_from_cs(item):
 
                     commentStatus = str(row[12].value),
                 )
-                if item.current:  
+
+                if item.current:
+                    print('BLOCKED HERE ------------------ //////////////////////')
+  
                     
                     comment.drasdocument_id = doc.id
                     

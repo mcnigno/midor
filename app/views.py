@@ -341,7 +341,8 @@ class CommentSheetView(ModelView):
 
 
     def pre_update(self, item):
-        session['last_document'] = item.drasdocument_id
+        if session['last_document']:
+            session['last_document'] = item.drasdocument_id
         
         
         # Find or Create Document
@@ -349,11 +350,11 @@ class CommentSheetView(ModelView):
     
     def post_add_redirect(self):
         """Override this function to control the redirect after add endpoint is called."""
-        
-        doc = str(session['last_document'])
-        print('POST EDIT FUNCTION ************ ',session['last_document'] )
+        if session['last_document']:
+            doc = str(session['last_document'])
+            print('POST EDIT FUNCTION ************ ',session['last_document'] )
 
-        return redirect(url_for('DrasdocumentView.show', pk=doc))
+            return redirect(url_for('DrasdocumentView.show', pk=doc))
 
 class CommentView(ModelView):
     datamodel = SQLAInterface(Drascomment)
