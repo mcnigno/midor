@@ -560,12 +560,14 @@ class DrasUploadView(ModelView):
     
     def post_add_redirect(self):
         # Override this function to control the redirect after add endpoint is called.
-        if session['last_document']:
-            doc = session['last_document']
-            #print('POST EDIT FUNCTION ************ ',session['last_document'] )
+        try:
+            if session['last_document']:
+                doc = session['last_document']
+                #print('POST EDIT FUNCTION ************ ',session['last_document'] )
 
-            return redirect(url_for('DrasdocumentView.show', pk=doc))
-    
+                return redirect(url_for('DrasdocumentView.show', pk=doc))
+        except:
+            print('Something still does not work for session')
 
 class TagdisciplineView(ModelView):
     datamodel = SQLAInterface(Tagdiscipline)
