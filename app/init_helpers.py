@@ -4,7 +4,7 @@ from app.models import (Mocmodel, Unitmodel, Dedocmodel,
                 Splitofworks, Disciplinedras, Drascommentsheet,
                 Drasissuetype, Drasactionrequired, Drascomment,
                 Drasrevision, Drasdocument, Tagdiscipline)
-from app.comments.helpers import get_data_from_cs, get_fake_data_from_cs, get_fake_data_from_cs2
+from app.comments.helpers import get_data_from_cs, get_fake_data_from_cs2
 from config import UPLOAD_FOLDER
 import uuid
 from flask_appbuilder.filemanager import FileManager
