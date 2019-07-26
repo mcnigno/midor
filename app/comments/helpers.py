@@ -935,7 +935,7 @@ def set_dsc():
 
     session.commit()
 
-set_dsc()
+#set_dsc()
 
 
 def set_process():
