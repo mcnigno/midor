@@ -649,8 +649,10 @@ appbuilder.add_separator(category="DRAS Components")
 #db.create_all()
 
 #add_moc()
+from app.comments.helpers import set_dsc
 
 db.create_all() 
+set_dsc()
 #upload_ewd()
 #create_file_list()
 #upload_correspondence()
