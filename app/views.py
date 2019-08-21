@@ -341,9 +341,11 @@ class CommentSheetView(ModelView):
 
 
     def pre_update(self, item):
-        if session['last_document']:
-            session['last_document'] = item.drasdocument_id
-        
+        try:
+            if session['last_document']:
+                session['last_document'] = item.drasdocument_id
+        except:
+            print('PRE UPDATE OF CommentSheetView: Session Exception')
         
         # Find or Create Document
         # Find or Create Revision
@@ -539,10 +541,12 @@ class DrasUploadView(ModelView):
         check_labels(item)
         doc = get_data_from_cs(item) 
         
-        if session['last_document']:
-            session['last_document'] = doc
-            print('PRE ADD FUNCTION ************ ',session['last_document'] )
-        
+        try:
+            if session['last_document']:
+                session['last_document'] = doc
+                print('PRE ADD FUNCTION ************ ',session['last_document'] )
+        except:
+            print('PRE ADD Function: Session Exception' )
 
         if doc == False:
             return abort(400, 'Pre Add Function Error.')
@@ -550,10 +554,12 @@ class DrasUploadView(ModelView):
         
 
     def pre_update(self, item):
-        if session['last_document']:
-            session['last_document'] = item.drasdocument_id
+        try:
+            if session['last_document']:
+                session['last_document'] = item.drasdocument_id
         
-        
+        except:
+            print('PRE UPDATE FUNCTION of COmmentSheetView: Session Exception')
         # Find or Create Document
         # Find or Create Revision
     
