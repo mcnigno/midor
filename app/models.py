@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, Boolean
 from flask import Markup, url_for
 from flask_appbuilder.filemanager import get_file_original_name
 from app import db
+from config import UPLOAD_FOLDER
 
 """
 
@@ -348,9 +349,11 @@ class Drascommentsheet(Model, AuditMixin):
         return get_file_original_name(self.cs_file)
      
     def download(self):
+        if self.cs_file[:2] =='/U': 
+            return Markup('<a href="'+ '/static/uploads/' + 'init/'+str(self.cs_file[41:]) + '" download>'+'<img border="0" src="/static/img/excel.png" alt="W3Schools" width="24" height="24">'+'</a>')
         return Markup('<a href="' + url_for('CommentSheetView.download', filename=str(self.cs_file)) + '" download>'+'<img border="0" src="/static/img/excel.png" alt="W3Schools" width="24" height="24">'+'</a>')
 
-    def stage_icon(self):
+    def stage_icon(self):  
         if self.stage == 'Y' or self.stage == 'Y2':
             return Markup('<i class="fa fa-arrow-circle-left" aria-hidden="true"></i>'+'<span>'+ self.stage + '</span>')
         if self.stage == 'YF':

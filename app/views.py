@@ -5,7 +5,7 @@ from app import appbuilder, db
 from .helpers import upload_ewd, upload_correspondence,create_file_list
 from .models import EarlyWorksDoc, Correspondence, Uop_Bpd, Uop_spec
 from flask_appbuilder.models.sqla.filters import FilterStartsWith, FilterEqualFunction, FilterEqual, FilterNotContains
-
+from flask import flash
 
 """
     DRASS Comments View Section
@@ -22,7 +22,7 @@ from app.models import (Disciplinedras, Mocmodel, Dedocmodel, Unitmodel,
 
 
 #from app import appbuilder, db
-from app.comments.helpers import check_labels, get_data_from_cs
+from app.comments.helpers import check_labels, get_data_from_cs, get_data_from_cs3
 from flask import session, redirect, url_for, abort
 from app.comments.customWidgets import commentListWidget, RevisionListCard
 from flask_appbuilder.widgets import ListBlock
@@ -214,8 +214,7 @@ class CommentSheetView(ModelView):
          {'fields': ['documentReferenceDoc', 
                     'documentReferenceRev', 
                     'documentReferenceDesc',
-                    'documentReferenceBy',
-                    'issuetype'], 'expanded': True}),
+                    'documentReferenceBy'], 'expanded': True}),
         
         (lazy_gettext('Owner Status'),
 
@@ -223,14 +222,17 @@ class CommentSheetView(ModelView):
                     'response_status'], 
                     'expanded': True}),
         
+        (lazy_gettext('DRAS Revision Info'),
+         {'fields': ['issuetype', 
+                    'actionrequired'], 'expanded': True}),
+        
         (lazy_gettext('Contractor Trasmittal Reference'), 
 
          {'fields': [
                     'contractorTransmittalDate',
                     'contractorTransmittalReference', 
                     'contractorTransmittalMr',
-                    'contractorTransmittalVendor',
-                    'actionrequired'], 
+                    'contractorTransmittalVendor'], 
                     'expanded': True}),
         
         (lazy_gettext('DRAS Notification'),
@@ -248,15 +250,14 @@ class CommentSheetView(ModelView):
     edit_fieldsets = [
         (lazy_gettext('DRAS Info'),
 
-         {'fields': ['drasdocument', 'drasrevision']}),
+         {'fields': ['drasdocument', 'drasrevision','stage']}),
         
         (lazy_gettext('Document Reference'),
 
          {'fields': ['documentReferenceDoc', 
                     'documentReferenceRev', 
                     'documentReferenceDesc',
-                    'documentReferenceBy',
-                    'issuetype'], 'expanded': True}),
+                    'documentReferenceBy'], 'expanded': True}),
         
         (lazy_gettext('Owner Transmittal Reference'),
 
@@ -268,10 +269,13 @@ class CommentSheetView(ModelView):
 
          {'fields': [ 
                     'contractorTransmittalMr',
-                    'contractorTransmittalVendor',
-                    'actionrequired'], 
+                    'contractorTransmittalVendor'], 
                     'expanded': True}),
-        
+
+        (lazy_gettext('DRAS Revision Info'),
+         {'fields': ['issuetype', 
+                    'actionrequired'], 'expanded': True}),
+
         (lazy_gettext('DRAS Notification'),
 
          {'fields': ['notificationItem',
@@ -287,10 +291,12 @@ class CommentSheetView(ModelView):
         (lazy_gettext('DRAS File'),
          {'fields': ['cs_file','current']}),
         
-        (lazy_gettext('DRAS Notification'),
+        (lazy_gettext('DRAS Revision Init | Only for "S"'),
          {'fields': ['issuetype', 
-                    'actionrequired', 
-                    'notificationItem',
+                    'actionrequired'], 'expanded': True}),
+
+        (lazy_gettext('DRAS Notification'),
+         {'fields': ['notificationItem',
                     'actualDate', 
                     'expectedDate',
                     'plannedDate'], 'expanded': True}),
@@ -330,7 +336,7 @@ class CommentSheetView(ModelView):
         
         # Check File Requirements
         check_labels(item)
-        doc = get_data_from_cs(item) 
+        doc = get_data_from_cs3(item) 
 
         #session['last_document'] = doc
         #print('PRE ADD FUNCTION ************ ',session['last_document'] )
@@ -517,10 +523,12 @@ class DrasUploadView(ModelView):
         (lazy_gettext('DRAS File'),
          {'fields': ['cs_file','current']}),
         
-        (lazy_gettext('DRAS Notification'),
+         (lazy_gettext('DRAS Revision Init | Only for "S"'),
          {'fields': ['issuetype', 
-                    'actionrequired', 
-                    'notificationItem',
+                    'actionrequired'], 'expanded': True}),
+        
+        (lazy_gettext('DRAS Notification'),
+         {'fields': ['notificationItem',
                     'actualDate', 
                     'expectedDate'], 'expanded': True}),
         
@@ -539,7 +547,7 @@ class DrasUploadView(ModelView):
         
         # Check File Requirements
         check_labels(item)
-        doc = get_data_from_cs(item) 
+        doc = get_data_from_cs3(item) 
         
         try:
             if session['last_document']:
@@ -563,7 +571,29 @@ class DrasUploadView(ModelView):
         # Find or Create Document
         # Find or Create Revision
     
+    def post_add(self, item):
+        # Take Issue Type and Action Required If "S" DRAS exist 
+        print('POST ADD function')
+        session = db.session
+        s = session.query(Drascommentsheet).filter(
+        Drascommentsheet.drasrevision_id == item.drasrevision_id,
+        Drascommentsheet.drasdocument_id == item.drasdocument_id,
+        Drascommentsheet.stage == 'S' 
+        ).first() 
     
+        if s and s.actionrequired_id and s.actionrequired_id:
+            #print('S found,',s.actionrequired_id, s.issuetype_id)
+            item.actionrequired_id = s.actionrequired_id
+            item.issuetype_id = s.issuetype_id
+            session.commit()
+        else:
+            flash('Controllare il DRAS "S" per questa revisione, Action Required e Issue Type non presenti', category='warning')
+            #print('No S Found, ', item.drasrevision_id,item.drasdocument_id)
+
+            #return super().post_add(item)
+    
+     
+
     def post_add_redirect(self):
         # Override this function to control the redirect after add endpoint is called.
         try:
