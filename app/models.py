@@ -349,7 +349,7 @@ class Drascommentsheet(Model, AuditMixin):
         return get_file_original_name(self.cs_file)
      
     def download(self):
-        if self.cs_file[:2] =='/U': 
+        if self.stage =='S': 
             return Markup('<a href="'+ '/static/uploads/' + 'init/'+str(self.cs_file[41:]) + '" download>'+'<img border="0" src="/static/img/excel.png" alt="W3Schools" width="24" height="24">'+'</a>')
         return Markup('<a href="' + url_for('CommentSheetView.download', filename=str(self.cs_file)) + '" download>'+'<img border="0" src="/static/img/excel.png" alt="W3Schools" width="24" height="24">'+'</a>')
 
