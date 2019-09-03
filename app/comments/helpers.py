@@ -661,7 +661,7 @@ def get_data_from_cs3(item):
         for cs in commentSheets:
             cs.current = False
     
-
+    session.commit()
     try:
         for row in csSheet.iter_rows(min_row=17,min_col=2):
             print('CommentStatus', row[0].value,row[9].value,row[10].value,row[11].value, type(row[11].value))
@@ -705,10 +705,17 @@ def get_data_from_cs3(item):
                     
 
                 #print('Contractor Status:',len(comment.contractorReplyStatus),comment.contractorReplyStatus)
-                session.add(comment)
-        #session.query(Comment).filter(Comment.document_id == doc.id).delete()
-    
+            
+            session.add(comment)
+                
+            
+            
+            
+            
+        #session.query(Comment).filter(Comment.document_id == doc.id).delete() 
     except:
+        session.rollback()
+        
         flash('COMMENTS ERROR 003 | Non è stato possibile caricare i commenti per questo DRAS', category='warning')
         item.note = 'COMMENTS ERROR 003: Badly Formatted. Please find the attached original DRAS in order to review you comments.'
 
