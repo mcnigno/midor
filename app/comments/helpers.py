@@ -227,7 +227,8 @@ def get_data_from_cs(item):
         
         try:
             revision = full_revision[:full_revision.index('S')]
-            rev_stage = full_revision[full_revision.index('S'):]
+            #rev_stage = full_revision[full_revision.index('S'):]
+            rev_stage = 'S'
         except:
             revision = full_revision[:full_revision.index('Y')]
             rev_stage = full_revision[full_revision.index('Y'):]
@@ -609,11 +610,13 @@ def get_data_from_cs3(item):
 
         abort(409)
 
+    '''
     if rev_stage == 'S' and not item.actionrequired_id and not item.issuetype_id:
+        print(item.actionrequired_id, item.issuetype)
         flash('DRAS in Stage "S", please select Action e Issue Type', category='warning')
 
         abort(409)
-    
+    '''
     session.flush()
 
     '''
