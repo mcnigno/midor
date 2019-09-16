@@ -593,11 +593,12 @@ class DrasUploadView(ModelView):
             item.issuetype_id = s.issuetype_id
             session.commit()
         else:
-            flash('Controllare il DRAS "S" per questa revisione, Action Required e Issue Type non presenti', category='warning')
+            flash('Controllare il DRAS "S" per questa revisione, Action Required e Issue Type non presenti.', category='warning')
             #print('No S Found, ', item.drasrevision_id,item.drasdocument_id)
 
             #return super().post_add(item)
-    
+        
+
      
 
     def post_add_redirect(self):

@@ -227,7 +227,8 @@ def get_data_from_cs(item):
         
         try:
             revision = full_revision[:full_revision.index('S')]
-            rev_stage = full_revision[full_revision.index('S'):]
+            #rev_stage = full_revision[full_revision.index('S'):]
+            rev_stage = 'S'
         except:
             revision = full_revision[:full_revision.index('Y')]
             rev_stage = full_revision[full_revision.index('Y'):]
@@ -609,11 +610,13 @@ def get_data_from_cs3(item):
 
         abort(409)
 
+    '''
     if rev_stage == 'S' and not item.actionrequired_id and not item.issuetype_id:
+        print(item.actionrequired_id, item.issuetype)
         flash('DRAS in Stage "S", please select Action e Issue Type', category='warning')
 
         abort(409)
-    
+    '''
     session.flush()
 
     '''
@@ -640,13 +643,13 @@ def get_data_from_cs3(item):
     item.documentReferenceBy = csSheet['L11'].value
 
     #item.documentReferenceBy = fdiscipline
-    indoor = ['Y','Y2']
-    outdoor = ['S','Y1','Y3']
+    indoor = ['S','Y','Y2']
+    outdoor = ['Y1','Y3']
 
     if rev_stage in indoor: 
-        item.expectedDate = item.actualDate + timedelta(days=7)
-    if rev_stage in outdoor:
         item.expectedDate = item.actualDate + timedelta(days=14)
+    if rev_stage in outdoor:
+        item.expectedDate = item.actualDate + timedelta(days=7)
     
     '''
     BODY - CREATE NEW COMMENTS FOR THIS CS
