@@ -1144,7 +1144,7 @@ def set_doc_dsc():
             print('no document found')
 
     #session.commit()
-set_doc_dsc() 
+#set_doc_dsc() 
 def set_process():
     session = db.session
    
