@@ -1117,8 +1117,34 @@ def set_dsc():
     session.commit()
 
 #set_dsc()
+def set_doc_dsc():
+    ''' Set the document discipline for all DRASs '''
+    session = db.session
+    
+    set_dsc = open('xlsx/set_doc_dsc.xlsx', mode='rb')
+    wmb = openpyxl.load_workbook(set_dsc, data_only=True)
+    ws = wmb.active
 
+    for row in ws.iter_rows(min_row=1):
+        print(row[0].value, row[1].value)
+        try:
+            doc_code = row[1].value
+            discipline = row[0].value
+            doc = session.query(Drasdocument).filter(Drasdocument.name == doc_code).first()
+            cs_list = session.query(Drascommentsheet).filter(Drascommentsheet.drasdocument_id == doc.id).all()
+            for cs in cs_list:
+                print(cs.changed_by_fk, cs.documentReferenceBy)
+                cs.documentReferenceBy = discipline
+                cs.changed_by_fk = '1'
+                #doc.changed_by_fk = '1'
+                session.commit()
+                #session.add(cs)
+                print(cs.changed_by_fk, cs.documentReferenceBy)
+        except:
+            print('no document found')
 
+    #session.commit()
+set_doc_dsc() 
 def set_process():
     session = db.session
    
