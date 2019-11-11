@@ -593,6 +593,7 @@ def get_data_from_cs3(item):
         print(rev)
         print('    ----------     Rev is None: ', revision, rev_stage, document)
         rev = Drasrevision(name=revision, drasdocument=doc)
+        rev.stage = rev_stage
         session.add(rev)
         
     rev.stage = rev_stage
