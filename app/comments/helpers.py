@@ -554,14 +554,18 @@ def get_data_from_cs3(item):
     try:
         document = item.cs_file.split('_sep_DRAS_')[1].split('_')[0]
         full_revision = item.cs_file.split('_sep_DRAS_')[1].split('_')[1].split('.')[0]
-        print('Heeeeeeeeeeeere ********************' )
+        print('Heeeeeeeeeeeere ********************',document,full_revision )
         
         try:
+            print('First Try on filename')
             revision = full_revision[:full_revision.index('S')]
             rev_stage = full_revision[full_revision.index('S'):]
+            print('First Try on filename', revision, rev_stage)
         except:
+            print('First Exception on filename')
             revision = full_revision[:full_revision.index('Y')]
             rev_stage = full_revision[full_revision.index('Y'):]
+            print('First Exception on filename', revision, rev_stage)
 
         oc_unit = document.split('-')[1]
         project = document.split('-')[0] 
