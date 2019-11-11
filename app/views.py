@@ -560,7 +560,7 @@ class DrasUploadView(ModelView):
                 session['last_document'] = doc
                 print('PRE ADD FUNCTION ************ ',session['last_document'] )
         except:
-            print('PRE ADD Function: Session Exception' )
+            print('PRE ADD Function: Session Exception')
 
         if doc == False:
             return abort(400, 'Pre Add Function Error.')

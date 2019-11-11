@@ -669,6 +669,7 @@ def get_data_from_cs3(item):
         for cs in commentSheets:
             cs.current = False
     
+    item.stage = rev_stage
     session.commit()
     try:
         for row in csSheet.iter_rows(min_row=17,min_col=2):
