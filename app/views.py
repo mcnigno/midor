@@ -636,7 +636,7 @@ def page_not_found(e):
 #appbuilder.add_view(MidorewdDashboardView, "Early Works Documentation", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
 appbuilder.add_view(MidorDrasDashboardView, "Comments", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
 appbuilder.add_view(MidorDras2DashboardView, "DRAS", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
-appbuilder.add_view(MidorDrasEstherDashboardView, "Esther Dashboard", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
+appbuilder.add_view(MidorDrasEstherDashboardView, "Export Dashboard", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
 appbuilder.add_separator(category="Dashboard")
 appbuilder.add_view(MidorDrasAIMDashboardView, "DRAS AIM (tmp)", icon="fa-folder-open-o", category="Dashboard", category_icon='fa-envelope')
 
