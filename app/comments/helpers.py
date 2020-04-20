@@ -552,8 +552,8 @@ def get_data_from_cs3(item):
     DRAS_2544-17-DW-0510-04_CY.xlsx
     '''
     try:
-        document = item.cs_file.split('_sep_DRAS_')[1].split('_')[0]
-        full_revision = item.cs_file.split('_sep_DRAS_')[1].split('_')[1].split('.')[0]
+        document = item.cs_file.split('_sep_DRAS_')[1].rsplit('_',1)[0]
+        full_revision = item.cs_file.split('_sep_DRAS_')[1].rsplit('_',1)[1].split('.')[0]
         print('Heeeeeeeeeeeere ********************',document,full_revision )
         
         try:
@@ -1165,3 +1165,4 @@ def set_process():
 
 #set_process() 
   
+
