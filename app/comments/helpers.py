@@ -672,6 +672,7 @@ def get_data_from_cs3(item):
     item.stage = rev_stage
     session.commit()
     try:
+        none_count = 0
         for row in csSheet.iter_rows(min_row=17,min_col=2):
             print('CommentStatus', row[0].value,row[9].value,row[10].value,row[11].value, type(row[11].value))
             
@@ -717,7 +718,12 @@ def get_data_from_cs3(item):
             
             session.add(comment)
                 
-            
+        else:
+            # Check on inifinite excel issue
+            none_count += 1
+            if none_count > 25:
+                flash('Excel BAD FORMAT: Infinite Comments', category='info')
+                raise Exception('Excel BAD FORMAT: Infinite Comments')
             
             
             
