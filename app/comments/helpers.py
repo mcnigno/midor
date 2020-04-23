@@ -716,14 +716,14 @@ def get_data_from_cs3(item):
 
                 #print('Contractor Status:',len(comment.contractorReplyStatus),comment.contractorReplyStatus)
             
-            session.add(comment)
+                session.add(comment)
                 
-        else:
-            # Check on inifinite excel issue
-            none_count += 1
-            if none_count > 25:
-                flash('Excel BAD FORMAT: Infinite Comments', category='info')
-                raise Exception('Excel BAD FORMAT: Infinite Comments')
+            else:
+                # Check on inifinite excel issue
+                none_count += 1
+                if none_count > 25:
+                    flash('Excel BAD FORMAT: Infinite Comments', category='info')
+                    raise Exception('Excel BAD FORMAT: Infinite Comments')
             
             
             
