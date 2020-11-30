@@ -561,9 +561,8 @@ class DrasUploadView(ModelView):
         doc = get_data_from_cs3(item) 
         
         try:
-            if session['last_document']:
-                session['last_document'] = doc
-                print('PRE ADD FUNCTION ************ ',session['last_document'] )
+            session['last_document'] = doc
+            print('PRE ADD FUNCTION ************ ',session['last_document'] )
         except:
             print('PRE ADD Function: Session Exception')
 
