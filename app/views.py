@@ -555,14 +555,13 @@ class DrasUploadView(ModelView):
     
     def pre_add(self, item):
         
-        
         # Check File Requirements
         check_labels(item)
         doc = get_data_from_cs3(item) 
         
         try:
             session['last_document'] = doc
-            print('PRE ADD FUNCTION ************ ',session['last_document'] )
+            print('PRE ADD FUNCTION ************ ', session['last_document'] )
         except:
             print('PRE ADD Function: Session Exception')
 
@@ -572,20 +571,22 @@ class DrasUploadView(ModelView):
         
 
     def pre_update(self, item):
+        '''
         try:
             if session['last_document']:
                 session['last_document'] = item.drasdocument_id
         
         except:
             print('PRE UPDATE FUNCTION of COmmentSheetView: Session Exception')
+        '''
         # Find or Create Document
         # Find or Create Revision
     
     def post_add(self, item):
         # Take Issue Type and Action Required If "S" DRAS exist 
         print('POST ADD function')
-        session = db.session
-        s = session.query(Drascommentsheet).filter(
+        db_session = db.session
+        s = db_session.query(Drascommentsheet).filter(
         Drascommentsheet.drasrevision_id == item.drasrevision_id,
         Drascommentsheet.drasdocument_id == item.drasdocument_id,
         Drascommentsheet.stage == 'S' 
@@ -595,7 +596,7 @@ class DrasUploadView(ModelView):
             #print('S found,',s.actionrequired_id, s.issuetype_id)
             item.actionrequired_id = s.actionrequired_id
             item.issuetype_id = s.issuetype_id
-            session.commit()
+            db_session.commit()
         else:
             flash('Controllare il DRAS "S" per questa revisione, Action Required e Issue Type non presenti.', category='warning')
             #print('No S Found, ', item.drasrevision_id,item.drasdocument_id)
@@ -608,13 +609,13 @@ class DrasUploadView(ModelView):
     def post_add_redirect(self):
         # Override this function to control the redirect after add endpoint is called.
         try:
-            if session['last_document']:
-                doc = session['last_document']
-                #print('POST EDIT FUNCTION ************ ',session['last_document'] )
+            #if session['last_document']:
+            doc = session['last_document']
+            #print('POST EDIT FUNCTION ************ ',session['last_document'] )
 
-                return redirect(url_for('DrasdocumentView.show', pk=doc))
+            return redirect(url_for('DrasdocumentView.show', pk=doc))
         except:
-            print('Something still does not work for session')
+            print('Something still does not work for session, doc:', doc )
             return redirect(self.get_redirect())
 
 class TagdisciplineView(ModelView):
