@@ -1,3 +1,4 @@
+from typing import ItemsView
 from flask import render_template, request
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_appbuilder import ModelView, BaseView, expose
@@ -22,7 +23,7 @@ from app.models import (Disciplinedras, Mocmodel, Dedocmodel, Unitmodel,
 
 
 #from app import appbuilder, db
-from app.comments.helpers import check_labels, get_data_from_cs, get_data_from_cs3
+from app.comments.helpers import check_labels, get_data_from_cs, get_data_from_cs3, get_data_from_cs4, set_current_and_last
 from flask import session, redirect, url_for, abort
 from app.comments.customWidgets import commentListWidget, RevisionListCard
 from flask_appbuilder.widgets import ListBlock
@@ -178,8 +179,80 @@ class ActionRequiredView(ModelView):
     datamodel = SQLAInterface(Drasactionrequired)
     list_columns = ['name']
 
+class CommentView(ModelView):
+    datamodel = SQLAInterface(Drascomment)
+    list_columns = ['tag','ownerCommentComment','contractorReplyStatus','contractorReplyComment','ownerCounterReplyComment','finalComment', 'commentStatus', 'pos']
+    show_title = 'Show Comment'
+    list_title = 'List Comments'
+    add_title = 'Add Comment'
+    edit_title = 'Edit Comment' 
+    search_columns = ['commentStatus']
+    list_widget = commentListWidget 
+    label_columns = {
+        'ownerCommentBy': 'by',
+        'ownerCommentDate': 'Date',
+        'ownerCommentComment': 'Owner:',
+
+        'contractorReplyDate': 'Date',
+        'contractorReplyStatus': 'Status',
+        'contractorReplyComment': 'Contractor:',
+
+        'ownerCounterReplyDate': 'Date',
+        'ownerCounterReplyComment' : 'Owner:',
+
+        'finalAgreementDate': 'Agreement Date', 
+        'finalAgreemntCommentDate':'Comment Date', 
+        'finalAgreementComment': 'Agreement:',
+        'commentStatus': 'Status'
+        
+    }
+
+    show_fieldsets = [
+        (lazy_gettext('DRAS Comment'),
+
+         {'fields': ['pos', 'tag', 'info']}),
+        
+        (lazy_gettext('Owner Comment'),
+
+         {'fields': ['ownerCommentBy', 
+                    'ownerCommentDate', 
+                    'ownerCommentComment'], 'expanded': True}),
+        
+        (lazy_gettext('Contractor Reply'),
+
+         {'fields': ['contractorReplyDate', 
+                    'contractorReplyStatus', 
+                    'contractorReplyComment'], 
+                    'expanded': False}),
+        
+        (lazy_gettext('Owner Counter Reply'), 
+
+         {'fields': ['ownerCounterReplyDate', 
+                    'ownerCounterReplyComment',], 
+                    'expanded': False}),
+        
+        (lazy_gettext('Final Agreement'),
+
+         {'fields': ['finalAgreementDate', 
+                    'finalAgreemntCommentDate', 
+                    'finalAgreementComment',
+                    'commentStatus'], 'expanded': False}),
+        
+        
+    ]
+   
+    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
+    def muldelete(self, items):
+        if isinstance(items, list):
+            self.datamodel.delete_all(items)
+            self.update_redirect()
+        else:
+            self.datamodel.delete(items)
+        return redirect(self.get_redirect())
+
 class CommentSheetView(ModelView):
     datamodel = SQLAInterface(Drascommentsheet)
+    related_views = [CommentView]
     add_title = 'View DRAS'
     edit_title = 'Edit DRAS'
     edit_exclude_columns = ['cs_file']
@@ -188,7 +261,7 @@ class CommentSheetView(ModelView):
     add_columns = ['cs_file', 'current'] 
     order_columns = ['actualDate']
     base_order = ('actualDate','asc') 
-    list_columns = ['drasrevision','stage_icon','actualDate','expectedDate','notificationItem','response_status', 'is_current', 'download'] 
+    list_columns = ['drasrevision','stage_icon','actualDate','expectedDate','notificationItem','response_status', 'is_current','is_last_stage', 'download'] 
     label_columns = {
         'documentReferenceDoc':     'Document',
         'documentReferenceRev':     'Revision', 
@@ -254,8 +327,8 @@ class CommentSheetView(ModelView):
         
         (lazy_gettext('DRAS Internal Info'),
 
-         {'fields': ['note'], 
-                    'expanded': False}),
+         {'fields': ['comments_uploaded','last_stage','note'], 
+                    'expanded': True}),
     ]
 
     edit_fieldsets = [
@@ -344,12 +417,11 @@ class CommentSheetView(ModelView):
 
     def pre_add(self, item):
         
-        
         # Check File Requirements
-        check_labels(item)
-        doc = get_data_from_cs3(item) 
+        #check_labels(item)
+        doc = get_data_from_cs4(item) 
 
-        #session['last_document'] = doc
+        session['last_document'] = doc
         #print('PRE ADD FUNCTION ************ ',session['last_document'] )
 
         if doc == False:
@@ -367,6 +439,18 @@ class CommentSheetView(ModelView):
         # Find or Create Document
         # Find or Create Revision
     
+    def pre_delete(self,item):
+        print(' ****** ****** **** PRE DELETE FUNCTION ****** ****** ****')
+        db_session = db.session
+        db_session.query(Drascomment).filter(
+            Drascomment.drascommentsheet_id == item.id
+        ).delete()
+        
+    def post_delete(self,item):
+        
+        update_current_and_last(item)
+        
+
     def post_add_redirect(self):
         """Override this function to control the redirect after add endpoint is called."""
         if session['last_document']:
@@ -375,76 +459,6 @@ class CommentSheetView(ModelView):
 
             return redirect(url_for('DrasdocumentView.show', pk=doc))
 
-class CommentView(ModelView):
-    datamodel = SQLAInterface(Drascomment)
-    list_columns = ['tag','ownerCommentComment','contractorReplyStatus','contractorReplyComment','ownerCounterReplyComment','finalComment', 'commentStatus', 'pos']
-    show_title = 'Show Comment'
-    list_title = 'List Comments'
-    add_title = 'Add Comment'
-    edit_title = 'Edit Comment' 
-    search_columns = ['commentStatus']
-    list_widget = commentListWidget 
-    label_columns = {
-        'ownerCommentBy': 'by',
-        'ownerCommentDate': 'Date',
-        'ownerCommentComment': 'Owner:',
-
-        'contractorReplyDate': 'Date',
-        'contractorReplyStatus': 'Status',
-        'contractorReplyComment': 'Contractor:',
-
-        'ownerCounterReplyDate': 'Date',
-        'ownerCounterReplyComment' : 'Owner:',
-
-        'finalAgreementDate': 'Agreement Date', 
-        'finalAgreemntCommentDate':'Comment Date', 
-        'finalAgreementComment': 'Agreement:',
-        'commentStatus': 'Status'
-        
-    }
-
-    show_fieldsets = [
-        (lazy_gettext('DRAS Comment'),
-
-         {'fields': ['pos', 'tag', 'info']}),
-        
-        (lazy_gettext('Owner Comment'),
-
-         {'fields': ['ownerCommentBy', 
-                    'ownerCommentDate', 
-                    'ownerCommentComment'], 'expanded': True}),
-        
-        (lazy_gettext('Contractor Reply'),
-
-         {'fields': ['contractorReplyDate', 
-                    'contractorReplyStatus', 
-                    'contractorReplyComment'], 
-                    'expanded': False}),
-        
-        (lazy_gettext('Owner Counter Reply'), 
-
-         {'fields': ['ownerCounterReplyDate', 
-                    'ownerCounterReplyComment',], 
-                    'expanded': False}),
-        
-        (lazy_gettext('Final Agreement'),
-
-         {'fields': ['finalAgreementDate', 
-                    'finalAgreemntCommentDate', 
-                    'finalAgreementComment',
-                    'commentStatus'], 'expanded': False}),
-        
-        
-    ]
-   
-    @action("muldelete", "Delete", "Delete all Really?", "fa-rocket")
-    def muldelete(self, items):
-        if isinstance(items, list):
-            self.datamodel.delete_all(items)
-            self.update_redirect()
-        else:
-            self.datamodel.delete(items)
-        return redirect(self.get_redirect())
 
 class RevisionView(ModelView):
     datamodel = SQLAInterface(Drasrevision)
@@ -499,6 +513,8 @@ class DrasdocumentView(ModelView):
 
          
     }
+
+from app.comments.helpers import update_current_and_last
 
 class DrasUploadView(ModelView):
     datamodel = SQLAInterface(Drascommentsheet)
@@ -556,8 +572,9 @@ class DrasUploadView(ModelView):
     def pre_add(self, item):
         
         # Check File Requirements
-        check_labels(item)
-        doc = get_data_from_cs3(item) 
+        #check_labels(item)
+        doc = get_data_from_cs4(item) 
+
         
         try:
             session['last_document'] = doc
@@ -567,8 +584,9 @@ class DrasUploadView(ModelView):
 
         if doc == False:
             return abort(400, 'Pre Add Function Error.')
-
+        print('Update CURRENT and LAST for',item)
         
+    
 
     def pre_update(self, item):
         '''
@@ -586,6 +604,7 @@ class DrasUploadView(ModelView):
         # Take Issue Type and Action Required If "S" DRAS exist 
         print('POST ADD function')
         db_session = db.session
+        ## UPDATE ACTION REQUIRED BY STAGE S IF AVAILABLE
         s = db_session.query(Drascommentsheet).filter(
         Drascommentsheet.drasrevision_id == item.drasrevision_id,
         Drascommentsheet.drasdocument_id == item.drasdocument_id,
@@ -602,9 +621,13 @@ class DrasUploadView(ModelView):
             #print('No S Found, ', item.drasrevision_id,item.drasdocument_id)
 
             #return super().post_add(item)
-        
 
-     
+        ## UPDATE COMMENTS FOR THE LAST STAGE FOR THIS REVISION
+        # 
+        update_current_and_last(item)
+
+    
+
 
     def post_add_redirect(self):
         # Override this function to control the redirect after add endpoint is called.
@@ -615,7 +638,7 @@ class DrasUploadView(ModelView):
 
             return redirect(url_for('DrasdocumentView.show', pk=doc))
         except:
-            print('Something still does not work for session, doc:', doc )
+            #print('Something still does not work for session, doc:', doc )
             return redirect(self.get_redirect())
 
 class TagdisciplineView(ModelView):
@@ -701,9 +724,11 @@ appbuilder.add_separator(category="DRAS Components")
 #db.create_all()
 
 #add_moc()
-from app.comments.helpers import set_dsc
+from app.comments.helpers import set_dsc, upload_all_comments, update_all_current_and_last
 
 db.create_all() 
+#update_all_current_and_last()
+#upload_all_comments()      
 #set_dsc()
 #upload_ewd()
 #create_file_list()

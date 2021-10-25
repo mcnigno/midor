@@ -324,7 +324,9 @@ class Drascommentsheet(Model, AuditMixin):
     # Set manual INPUT
 
     cs_file = Column(FileColumn, nullable = False)
-    current = Column(Boolean, default=True)
+    current = Column(Boolean, default=False)
+    last_stage = Column(Boolean, default=False)
+    comments_uploaded = Column(Boolean, default=False)
     
     documentClientCode = Column(String(50))
 
@@ -340,6 +342,7 @@ class Drascommentsheet(Model, AuditMixin):
     plannedDate = Column(Date)
 
     note = Column(Text)
+    
 
 
     def __repr__(self):
@@ -367,6 +370,12 @@ class Drascommentsheet(Model, AuditMixin):
         if self.current:
             return Markup('<small class="Current">current</small>')
         return Markup('<small class="Superseeded">Superseeded</small>')
+
+    def is_last_stage(self):
+        if self.last_stage:
+            return Markup('<small class="Last">Last in REV -'+ str(self.drasrevision)+' </small>')
+        else:
+            return " "
 
 class Drascomment(Model, AuditMixin):
     id = Column(Integer, primary_key=True)

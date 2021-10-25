@@ -260,6 +260,16 @@ i.fa.fa-file-word-o {
     text-align: center;
     color: whitesmoke;
 }
+
+.Last{
+    padding: 4px;
+    width: 68px;
+    background-color: #d36c27;
+    font-size: 8pt;
+    text-transform: uppercase;
+    text-align: center;
+    color: whitesmoke;
+}
 .RevCardTitle {
     background-color: rgb(41, 110, 167);
     text-align: center;
