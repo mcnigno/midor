@@ -1362,6 +1362,7 @@ def get_data_from_cs4(item):
             cs.current = False
     '''
     item.stage = rev_stage
+    item.note = "Piero003"
     session.commit()
     try:
         none_count = 0
@@ -1733,3 +1734,181 @@ def upload_all_comments():
 
     '''
 
+def update_all_eng_data_from_cs(item):
+    #item ='4def885a-604b-11e9-bffd-ac87a32187da_sep_DRAS_2544-17-DW-0510-04_CY.xlsx'
+    session = db.session
+    
+    
+    csFile = openpyxl.load_workbook(UPLOAD_FOLDER+item.cs_file, data_only=True)
+    csSheet = csFile.active
+    
+    deleted = session.query(Drascomment).filter(Drascomment.drascommentsheet_id == item.id).delete()
+     
+    #print('Delete Comments -+-+-+',item,deleted) 
+
+    try:
+        none_count = 0
+        comments = 0
+        
+        for row in csSheet.iter_rows(min_row=17,min_col=2):
+            
+            
+            if row[0].value is not None and row[1].value is not None:
+                #print('pos',row[0].value,'tag',row[1].value,'info',row[2].value)
+                
+                if csSheet['L14'].value == 'Final Agreement':
+                    comment = Drascomment(
+                        drasdocument = item.drasdocument,
+                        drasrevision = item.drasrevision,
+                        drascommentsheet = item,
+                        
+                        tagdiscipline= session.query(Tagdiscipline).filter(
+                                                    Tagdiscipline.start <= int(row[1].value), 
+                                                    Tagdiscipline.finish >= int(row[1].value)).first(), 
+                    
+
+                        pos = row[0].value,
+                        tag = row[1].value,
+                        info = row[2].value,
+                        ownerCommentBy = row[3].value,
+                        ownerCommentDate = date_parse(csSheet['F15'].value),
+                        ownerCommentComment = text_decode(row[4].value) ,
+
+                        contractorReplyDate = date_parse(csSheet['H15'].value),
+                        contractorReplyStatus = row[5].value,
+                        contractorReplyComment = text_decode(row[6].value),
+                        
+                        ownerCounterReplyDate = date_parse(csSheet['K15'].value),
+                        ownerCounterReplyComment = text_decode(row[8].value),
+
+                        finalAgreementDate = date_parse(csSheet['M15'].value),
+                        finalAgreemntCommentDate = date_parse(row[10].value),
+                        finalAgreementComment = text_decode(row[11].value),
+
+                        commentStatus = str(row[12].value),
+                    )
+
+                    #if item.current:
+                        #comment.drasdocument_id = doc.id
+                    #print('Contractor Status:',len(comment.contractorReplyStatus),comment.contractorReplyStatus)
+                    #session.add(comment)
+                    #session.commit()
+                else:
+                    comment = Drascomment(
+                        drasdocument = item.drasdocument,
+                        drasrevision = item.drasrevision,
+                        drascommentsheet = item,
+                        
+                        tagdiscipline= session.query(Tagdiscipline).filter(
+                                                    Tagdiscipline.start <= int(row[1].value), 
+                                                    Tagdiscipline.finish >= int(row[1].value)).first(), 
+
+                        pos = row[0].value,
+                        tag = row[1].value,
+                        info = row[2].value,
+                        
+                        ownerCommentBy = row[3].value,
+                        ownerCommentDate = date_parse(csSheet['F15'].value),
+                        ownerCommentComment = text_decode(row[4].value),
+
+                        contractorReplyDate = date_parse(csSheet['H15'].value),
+                        contractorReplyStatus = row[5].value,
+                        contractorReplyComment = text_decode(row[6].value),
+                        
+                        ownerCounterReplyDate = date_parse(csSheet['J15'].value),
+                        ownerCounterReplyComment = text_decode(row[7].value),
+
+                        finalAgreementDate = date_parse(csSheet['L15'].value),
+                        finalAgreemntCommentDate = date_parse(row[9].value),
+                        finalAgreementComment = text_decode(row[10].value),
+
+                        commentStatus = str(row[11].value),
+                        
+                    )
+                ## SET MAX LENGHT
+                if comment.commentStatus:
+                    comment.commentStatus = comment.commentStatus[:20]
+                if comment.ownerCommentBy:
+                    comment.ownerCommentBy = comment.ownerCommentBy[:50]
+                
+                if comment.pos:
+                    comment.pos = str(comment.pos)[:5]
+
+                if comment.contractorReplyStatus:
+                    comment.contractorReplyStatus = comment.contractorReplyStatus[:100]
+
+                comment.created_by_fk = '1'
+                comment.changed_by_fk = '1'
+                
+                comments += 1
+                session.add(comment)
+
+            else:
+                # Check on inifinite excel issue
+                none_count += 1
+                if none_count > 35:
+                    break
+                    #raise Exception('Excel BAD FORMAT: Infinite Comments')
+        #session.query(Comment).filter(Comment.document_id == doc.id).delete()
+        session.commit()
+        
+        return item, comments 
+    except Exception as e:
+        session.rollback()
+
+
+def piero_items():
+    #item ='4def885a-604b-11e9-bffd-ac87a32187da_sep_DRAS_2544-17-DW-0510-04_CY.xlsx'
+    session = db.session
+    csFile = openpyxl.load_workbook('app/comments/Piero_eng.xlsx', data_only=True)
+    csSheet = csFile.active
+
+    start = 0 
+
+    for row in csSheet.iter_rows(min_row=2, min_col=1):
+        if row[2].value is None:
+            start += 1
+            try:
+                document = row[0].value[:str(row[0].value).rindex('_')]
+                rev = row[0].value[str(row[0].value).rindex('_')+1:]
+                
+                dras_doc = session.query(Drasdocument).filter(Drasdocument.name == document).first()
+                
+                if dras_doc: 
+                    dras_rev = session.query(Drasrevision).filter(
+                        Drasrevision.name == rev,
+                        Drasrevision.drasdocument_id == dras_doc.id).first()
+
+                    if dras_rev:
+                        dras = session.query(Drascommentsheet).filter(
+                            Drascommentsheet.stage == 'YF',
+                            Drascommentsheet.drasrevision_id == dras_rev.id).first() 
+                        
+                        if dras:
+                            dras, comments = update_all_eng_data_from_cs(dras)
+                            dras.note = 'Piero003'
+                            dras.changed_by_fk = '1'
+                            session.commit()
+                            
+                            print(start,dras.drasdocument, dras.drasrevision, dras.stage, 'C: ',comments)
+
+                            csSheet.cell(row=row[0].row,column=3).value = 'OK'
+                            csSheet.cell(row=row[0].row,column=4).value = comments 
+                        else:
+                            print(start,' ',document,'DRAS | NOT FOUND')
+                            csSheet.cell(row=row[0].row,column=3).value = 'NO DRAS'
+                    else:
+                            csSheet.cell(row=row[0].row,column=3).value = 'NO REV'
+                            print(start,' ',document,'REV | NOT FOUND')
+                else:
+                            csSheet.cell(row=row[0].row,column=3).value = 'NO DOC' 
+                            print(start,' ',document,'DOC | NOT FOUND') 
+                
+                
+            except Exception as e:
+                csSheet.cell(row=row[0].row,column=3).value = 'Error'
+                csSheet.cell(row=row[0].row,column=5).value = str(e) 
+                print(e) 
+    
+    csFile.save('app/comments/Piero_eng.xlsx')
+    csFile.close() 

@@ -403,7 +403,7 @@ class CommentSheetView(ModelView):
             self.datamodel.delete(items)
         return redirect(self.get_redirect())
     
-    @action("setcurrent", "Set as Current", "Set all as Curent Really?", "fa-rocket", multiple=False)
+    @action("setcurrent", "Update Comments", "Update all comments Really?", "fa-rocket", multiple=False)
     def setcurrent(self, items):
         item = items
          
@@ -724,9 +724,10 @@ appbuilder.add_separator(category="DRAS Components")
 #db.create_all()
 
 #add_moc()
-from app.comments.helpers import set_dsc, upload_all_comments, update_all_current_and_last
+from app.comments.helpers import set_dsc, upload_all_comments, update_all_current_and_last, piero_items
 
 db.create_all() 
+#piero_items()
 #update_all_current_and_last()
 #upload_all_comments()      
 #set_dsc()
